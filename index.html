@@ -738,6 +738,22 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
 ". Share it privately and ask them to change it under Profile.": ". Communiquez-le en privé et demandez-leur de le changer sous Profil.",
 ". Share it privately and ask them to change it under Services and listing.": ". Communiquez-le en privé et demandez-leur de le changer sous Services et fiche.",
 "Status": "Statut",
+"Enlist an organization": "Inscrire un organisme",
+"Add a shelter or housing provider that has not registered itself. They can claim the page later.": "Ajoutez un refuge ou un fournisseur de logements qui ne s’est pas inscrit lui-même. Il pourra réclamer la page plus tard.",
+"Add organization": "Ajouter l’organisme",
+"Use the details they gave you. They show in Find right away. Rooms and units counts can be updated by them after they claim the page.": "Utilisez les renseignements qu’ils vous ont donnés. Ils apparaissent tout de suite dans Trouver. Ils pourront mettre à jour leurs chambres et logements après avoir réclamé la page.",
+"What do they offer?": "Qu’offrent-ils?",
+"Who do they serve?": "Qui servent-ils?",
+"I have confirmed this organization is real (mark as verified).": "J’ai confirmé que cet organisme existe (marquer comme vérifié).",
+"Enter the organization’s name.": "Entrez le nom de l’organisme.",
+"Enter how many rooms or units they have in total.": "Entrez le nombre total de chambres ou de logements qu’ils ont.",
+"Organization added.": "Organisme ajouté.",
+"If the administrator added your organization for you, enter the claim code you were given. You will become its owner.": "Si l’administrateur a ajouté votre organisme pour vous, entrez le code de réclamation qu’on vous a remis. Vous en deviendrez le propriétaire.",
+"Added by the administrator": "Ajouté par l’administrateur",
+"Not yet claimed": "Pas encore réclamé",
+"Give this claim code to the organization:": "Remettez ce code de réclamation à l’organisme :",
+". They choose Organizations, then Join your team, and enter it. The first person to use it becomes the owner.": ". Ils choisissent Organismes, puis Joindre votre équipe, et l’entrent. La première personne qui l’utilise devient le propriétaire.",
+"Intake rules and what to bring": "Règles d’accueil et quoi apporter",
 "Sent": "Envoyée",
 "Requested": "Demandé",
 "Updated": "Mis à jour",
@@ -844,6 +860,10 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
 "Only organizations you send a request to, and only after you agree to share with them. You can see who looked you up under Profile, and you can withdraw a request at any time.": "Seulement les organismes à qui vous envoyez une demande, et seulement après que vous avez accepté de partager avec eux. Vous pouvez voir qui vous a recherché sous Profil, et retirer une demande en tout temps."
 };
   var FRP = [
+  [/^(.+) was added\.$/, '$1 a été ajouté.'],
+  [/^claim code (.+)$/, 'code de réclamation $1'],
+  [/^(.+) claimed this organization$/, '$1 a réclamé cet organisme'],
+  [/^You now manage (.+)\.$/, 'Vous gérez maintenant $1.'],
   [/^updated (.+?)\. Keep this current: people plan their night around it\.$/, function (m, t) { return 'mis à jour ' + t(m[1]) + '. Gardez ceci à jour : les gens planifient leur nuit en fonction de cela.'; }],
   [/^rooms open across (\d+) shelters right now$/, 'chambres libres dans $1 refuges en ce moment'],
   [/^Hello, (.+)$/, 'Bonjour, $1'],
@@ -902,8 +922,8 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
   [/^(\d+) (rooms?|units?) available\. Raise the count first\.$/, 'Aucune disponibilité à retirer. Augmentez d’abord le nombre.'],
   [/^Shelter · (.+) · sample listing$/, 'Refuge · $1 · fiche d’exemple'],
   [/^Housing provider · (.+) · sample listing$/, 'Fournisseur de logements · $1 · fiche d’exemple'],
-  [/^Shelter · (.+)$/, 'Refuge · $1'],
-  [/^Housing provider · (.+)$/, 'Fournisseur de logements · $1'],
+  [/^Shelter · (.+)$/, function (m, t) { return 'Refuge · ' + t(m[1]); }],
+  [/^Housing provider · (.+)$/, function (m, t) { return 'Fournisseur de logements · ' + t(m[1]); }],
   [/^Housing provider$/, 'Fournisseur de logements'],
   [/^(.+) · (.+) · wait (\d+) months?$/, '$1 · $2 · attente de $3 mois'],
   [/^I checked their ID, mark verified$/, 'J’ai vérifié leur pièce d’identité, marquer comme vérifié'],
@@ -1105,7 +1125,7 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     if (R.auth === 'forgot') body = forgotForm();
     else if (R.auth === 'in') body = signInForm('org');
     else if (R.auth === 'join') body = '<div class="card"><h2>Join your team</h2><p class="small muted">Ask the person who registered your organization for the team code. You will find it under Team.</p>' +
-      fld('j-code', 'Team code', 'text', 'jcode', 'e.g. K7P2QX') + fld('j-name', 'Your name', 'text', 'cname', '', 'name') + login + agreeLine('oagree', 'I am allowed to act for this organization.') + err() + '<button class="btn" data-act="signup-staff">Join team</button></div>';
+      '<p class="small muted">If the administrator added your organization for you, enter the claim code you were given. You will become its owner.</p>' + fld('j-code', 'Team code', 'text', 'jcode', 'e.g. K7P2QX') + fld('j-name', 'Your name', 'text', 'cname', '', 'name') + login + agreeLine('oagree', 'I am allowed to act for this organization.') + err() + '<button class="btn" data-act="signup-staff">Join team</button></div>';
     else body = '<div class="card"><h2>Register your organization</h2><p class="small muted">This creates your organization page and the login you will use to manage it. You can add colleagues later.</p>' +
       fld('o-name', 'Organization name', 'text', 'oname', 'e.g. Harbour Light Shelter', 'organization') +
       '<div class="field"><label for="o-kind">What do you offer?</label><select class="input" id="o-kind" data-d="okind"><option value="shelter"' + (dv('okind', 'shelter') === 'shelter' ? ' selected' : '') + '>Shelter (beds or rooms)</option><option value="housing"' + (dv('okind', 'shelter') === 'housing' ? ' selected' : '') + '>Housing provider (units)</option></select></div>' +
@@ -1380,12 +1400,13 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       '<button class="btn" data-act="savelisting">Save listing</button></div>' + pwCard() + feedbackForm() +
       '<div class="card"><h3>Account</h3><button class="link" data-act="showprivacy" style="align-self:flex-start">Read Privacy and terms</button><p class="small muted">Signed in as ' + esc((account() && (account().email || showPhone(account().phone))) || 'the sample organization') + '.</p><button class="btn ghost sm" data-act="signout" style="align-self:flex-start">Sign out</button></div>';
   }
+  function isOrgOwner(o, accId) { return !!o && !!accId && (accId === o.id || accId === o.ownerId); }
   function team(o) {
     var members = vals('accounts').filter(function (a) { return a.role === 'org' && (a.orgId || a.id) === o.id; });
-    var owner = !!(ses.demo || ses.accId === o.id);
+    var owner = !!(ses.demo || isOrgOwner(o, ses.accId));
     return (R.tempPw ? '<div class="banner"><b>Temporary password for ' + esc(R.tempPw.name) + ':</b> <span class="mono">' + esc(R.tempPw.pw) + '</span>. Share it privately and ask them to change it under Services and listing. <button class="link" data-act="hidetemp">Hide</button></div>' : '') + '<div class="card"><h2>Team</h2><p class="small muted">Share this code with colleagues. When they create an account they choose “Join your team” and enter it.</p><div class="row"><span class="demo">' + esc(o.invite || 'No code yet') + '</span>' + (owner ? '<button class="btn ghost sm" data-act="newinvite">' + (o.invite ? 'Make a new code' : 'Create code') + '</button>' : '') + '</div></div>' +
       '<div class="card"><h3>People with access</h3>' + (members.length ? '<div class="scroll"><table class="table"><thead><tr><th>Name</th><th>Contact</th><th>Role</th><th></th></tr></thead><tbody>' + members.map(function (a) {
-        return '<tr><td>' + esc(a.name) + '</td><td>' + esc(a.email || showPhone(a.phone)) + '</td><td>' + (a.id === o.id ? 'Owner' : 'Staff') + (a.disabled ? ' (removed)' : '') + '</td><td>' + (owner && a.id !== o.id ? '<div class="row"><button class="btn ghost sm" data-act="resetpw" data-v="' + a.id + '">Reset password</button><button class="btn ' + (a.disabled ? '' : 'danger') + ' sm" data-act="toggleacct" data-v="' + a.id + '">' + (a.disabled ? 'Restore' : 'Remove') + '</button></div>' : '') + '</td></tr>';
+        return '<tr><td>' + esc(a.name) + '</td><td>' + esc(a.email || showPhone(a.phone)) + '</td><td>' + (isOrgOwner(o, a.id) ? 'Owner' : 'Staff') + (a.disabled ? ' (removed)' : '') + '</td><td>' + (owner && !isOrgOwner(o, a.id) ? '<div class="row"><button class="btn ghost sm" data-act="resetpw" data-v="' + a.id + '">Reset password</button><button class="btn ' + (a.disabled ? '' : 'danger') + ' sm" data-act="toggleacct" data-v="' + a.id + '">' + (a.disabled ? 'Restore' : 'Remove') + '</button></div>' : '') + '</td></tr>';
       }).join('') + '</tbody></table></div>' : '<p class="small muted">No team accounts yet.</p>') + '</div>';
   }
   function verifyPerson(o) {
@@ -1397,6 +1418,23 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
   }
 
   /* ---------- administrator console ---------- */
+  function addOrgCard() {
+    var open = R.addOrg;
+    var note = R.newOrg ? '<div class="banner"><b>' + esc(R.newOrg.name) + ' was added.</b> Give this claim code to the organization: <span class="mono">' + esc(R.newOrg.invite) + '</span>. They choose Organizations, then Join your team, and enter it. The first person to use it becomes the owner. <button class="link" data-act="hidenewadd">Hide</button></div>' : '';
+    if (!open) return note + '<div class="card"><div class="row between"><div class="grow"><h3>Enlist an organization</h3><p class="small muted">Add a shelter or housing provider that has not registered itself. They can claim the page later.</p></div><button class="btn" data-act="addorgform">Add organization</button></div></div>';
+    return note + '<div class="card"><h3>Enlist an organization</h3><p class="small muted">Use the details they gave you. They show in Find right away. Rooms and units counts can be updated by them after they claim the page.</p>' +
+      fld('ao-name', 'Organization name', 'text', 'ao_name', 'e.g. Harbour Light Shelter') +
+      '<div class="field"><label for="ao-kind">What do they offer?</label><select class="input" id="ao-kind" data-d="ao_kind"><option value="shelter"' + (dv('ao_kind', 'shelter') === 'shelter' ? ' selected' : '') + '>Shelter (beds or rooms)</option><option value="housing"' + (dv('ao_kind', 'shelter') === 'housing' ? ' selected' : '') + '>Housing provider (units)</option></select></div>' +
+      fld('ao-area', 'Area or neighbourhood', 'text', 'ao_area', 'e.g. Dartmouth') + fld('ao-addr', 'Street address (optional)', 'text', 'ao_addr', '') +
+      '<div class="grid2">' + fld('ao-phone', 'Phone number', 'tel', 'ao_phone', '902-555-0100') + fld('ao-email', 'Public email', 'email', 'ao_email', 'office@example.org') + '</div>' +
+      '<div class="grid2">' + fld('ao-total', 'Total rooms or units', 'number', 'ao_total', '20') + fld('ao-avail', 'Available right now', 'number', 'ao_avail', '5') + '</div>' +
+      fld('ao-hours', 'Hours and intake times', 'text', 'ao_hours', '') +
+      '<div class="field"><label>Who do they serve?</label>' + chips('ao_groups', GROUPS, null, ['Adults']) + '</div>' +
+      '<div class="field"><label>Services</label>' + chips('ao_services', SERVICES, null, []) + '</div>' +
+      '<div class="field"><label for="ao-rules">Intake rules and what to bring</label><textarea class="input" id="ao-rules" data-d="ao_rules" rows="2">' + esc(dv('ao_rules', '')) + '</textarea></div>' +
+      '<label class="row small"><input type="checkbox" data-dc="ao_ver" ' + (dv('ao_ver', true) ? 'checked' : '') + '> <span>I have confirmed this organization is real (mark as verified).</span></label>' + err() +
+      '<div class="row"><button class="btn" data-act="saveorg">Add organization</button><button class="btn ghost" data-act="addorgform">Cancel</button></div></div>';
+  }
   function admin() {
     var tabs = [['orgs', 'Organizations'], ['people', 'People'], ['reqs', 'All requests'], ['accts', 'Accounts'], ['feedback', 'Feedback' + (vals('feedback').length ? ' (' + vals('feedback').length + ')' : '')], ['tools', 'Tools']];
     var persons = vals('people').length, orgs = allOrgs().length, reqs = vals('requests').length, open = 0;
@@ -1425,9 +1463,9 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       return head + '<div class="card"><h3>Demo people and requests</h3><p class="small muted">Adds four fictional people with requests to the listed organizations, so every organization has something to review while you test. Demo people have no login.</p><div class="row"><button class="btn" data-act="seeddemo">Add demo data</button><button class="btn ghost" data-act="removedemo"' + (demo ? '' : ' disabled') + '>Remove demo data' + (demo ? ' (' + demo + ' people)' : '') + '</button></div></div>' +
         '<div class="card"><h3>Exports</h3><div class="row"><button class="btn ghost sm" data-act="csvall">All requests (CSV)</button><button class="btn ghost sm" data-act="csvaccts">All accounts (CSV)</button></div></div>';
     }
-    return head + allOrgs().map(function (o) {
+    return head + addOrgCard() + allOrgs().map(function (o) {
       var rs = orgRequests(o.id), sample = o.id.indexOf('sample-') === 0;
-      return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(o.name) + '</h3><div class="small muted">' + (o.kind === 'shelter' ? 'Shelter' : 'Housing provider') + ' · ' + esc(o.area || '') + (sample ? ' · sample listing' : '') + '</div></div>' + (o.status === 'Suspended' ? '<span class="pill crit">Suspended</span>' : '') + (o.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill idle">Not verified</span>') + '</div>' +
+      return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(o.name) + '</h3><div class="small muted">' + (o.kind === 'shelter' ? 'Shelter' : 'Housing provider') + (o.area ? ' · ' + esc(o.area) : '') + (sample ? ' · sample listing' : '') + (o.claimable && !o.ownerId ? ' · Not yet claimed · claim code ' + esc(o.invite || '') : '') + '</div></div>' + (o.status === 'Suspended' ? '<span class="pill crit">Suspended</span>' : '') + (o.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill idle">Not verified</span>') + '</div>' +
         '<div class="small muted">' + o.available + ' of ' + o.total + ' ' + unit(o) + 's open · ' + rs.length + ' requests (' + rs.filter(function (r) { return r.status === 'Pending'; }).length + ' pending)' + (o.availT ? ' · counts updated ' + ago(o.availT) : '') + '</div>' +
         '<div class="row"><button class="btn ' + (o.verified ? 'ghost' : '') + ' sm" data-act="orgverify" data-v="' + o.id + '">' + (o.verified ? 'Remove verified badge' : 'Mark verified') + '</button><button class="btn ' + (o.status === 'Suspended' ? '' : 'danger') + ' sm" data-act="orgsuspend" data-v="' + o.id + '">' + (o.status === 'Suspended' ? 'Restore listing' : 'Suspend listing') + '</button></div></div>';
     }).join('');
@@ -1580,7 +1618,12 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       if (!d.oagree) { R.errs = 'Please tick the box to agree to the Privacy and terms.'; return; }
       var res = makeAccount('org', d.cname.trim(), phone, email, d.pw);
       if (res.error) { R.errs = res.error; return; }
-      var a = clone(mem.accounts[res.id]); a.orgId = o.id; put('accounts', res.id, a); orgLog(o.id, a.name + ' joined the team');
+      var a = clone(mem.accounts[res.id]); a.orgId = o.id; put('accounts', res.id, a);
+      if (o.claimable && !o.ownerId) {
+        orgEdit(o.id, function (x) { x.ownerId = res.id; x.claimable = false; x.invite = rid(6).toUpperCase(); }); orgLog(o.id, a.name + ' claimed this organization');
+        startSession(res.id, { orgId: o.id }); R.showCode = res.code; toast('You now manage ' + o.name + '.'); return;
+      }
+      orgLog(o.id, a.name + ' joined the team');
       startSession(res.id, { orgId: o.id }); R.showCode = res.code; toast('You joined ' + o.name + '.');
     },
     signin: function (v, el) {
@@ -1703,7 +1746,7 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     csvaccts: function () { var rows = [['Name', 'Type', 'Phone', 'Email', 'Created', 'Disabled']]; vals('accounts').forEach(function (a) { rows.push([a.name, a.role, showPhone(a.phone), a.email || '', a.created, a.disabled ? 'Yes' : '']); }); dl('accounts.csv', toCsv(rows)); },
     resetpw: function (v) {
       var a = mem.accounts[v]; if (!a) return;
-      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || ses.accId === ses.orgId) && a.id !== ses.accId);
+      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || isOrgOwner(orgById(ses.orgId), ses.accId)) && a.id !== ses.accId);
       if (!ok) { toast('You cannot reset that account.'); return; }
       var pw = rid(8); setPassword(v, pw); R.tempPw = { name: a.name, pw: pw };
     },
@@ -1728,11 +1771,26 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       vals('people').forEach(function (p) { if (p.id.indexOf('demo-') === 0) del('people', p.id); });
       toast('Demo data removed.');
     },
+    addorgform: function () { R.addOrg = !R.addOrg; R.errs = ''; if (!R.addOrg) R.draft = {}; },
+    hidenewadd: function () { R.newOrg = null; },
+    saveorg: function () {
+      if (role() !== 'admin') return;
+      var d = R.draft, name = (d.ao_name || '').trim(), phone = normPhone(d.ao_phone), email = normEmail(d.ao_email);
+      var total = Math.max(0, parseInt(d.ao_total, 10) || 0), avail = Math.max(0, parseInt(d.ao_avail, 10) || 0);
+      if (!name) { R.errs = 'Enter the organization’s name.'; return; }
+      if (!total) { R.errs = 'Enter how many rooms or units they have in total.'; return; }
+      if (avail > total) { R.errs = 'Available cannot be more than the total.'; return; }
+      if ((d.ao_phone || '').trim() && !phone) { R.errs = 'Enter a 10-digit phone number, or leave it empty.'; return; }
+      if ((d.ao_email || '').trim() && !email) { R.errs = 'That email does not look right.'; return; }
+      var id = 'org-' + rid(8), inv = rid(6).toUpperCase();
+      put('orgs', id, { kind: d.ao_kind || 'shelter', name: name, area: (d.ao_area || '').trim(), address: (d.ao_addr || '').trim(), phone: showPhone(phone), email: email, hours: (d.ao_hours || '').trim(), desc: '', rules: (d.ao_rules || '').trim(), groups: d.ao_groups || ['Adults'], services: d.ao_services || [], total: total, available: avail, availT: now(), accepting: true, announcement: '', status: 'Listed', verified: d.ao_ver !== false, invite: inv, claimable: true, ownerId: '', addedBy: 'administrator', log: [{ m: 'Added by the administrator', t: now() }], created: now() });
+      R.newOrg = { name: name, invite: inv }; R.addOrg = false; R.draft = {}; R.errs = ''; toast('Organization added.');
+    },
     orgverify: function (v) { var on = !orgById(v).verified; orgEdit(v, function (o) { o.verified = on; }); orgLog(v, on ? 'Marked verified by the administrator' : 'Verified badge removed by the administrator'); },
     orgsuspend: function (v) { var sus = orgById(v).status !== 'Suspended'; orgEdit(v, function (o) { o.status = sus ? 'Suspended' : 'Listed'; }); orgLog(v, sus ? 'Listing suspended by the administrator' : 'Listing restored by the administrator'); },
     toggleacct: function (v) {
       var a = mem.accounts[v]; if (!a) return;
-      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || ses.accId === ses.orgId) && a.id !== ses.accId);
+      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || isOrgOwner(orgById(ses.orgId), ses.accId)) && a.id !== ses.accId);
       if (!ok) { toast('You cannot change that account.'); return; }
       a = clone(a); a.disabled = !a.disabled; put('accounts', v, a);
     }
