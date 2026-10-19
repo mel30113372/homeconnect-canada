@@ -1,0 +1,1800 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HomeConnect Canada</title>
+<meta name="theme-color" content="#0B6E6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HomeConnect">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one centered column. Person app has a bottom tab bar; organization and admin consoles have top tabs.
+   Palette: harbour ink, sea-glass teal accent, cool paper neutrals; status colours are separate. */
+:root {
+  --bg:#F1F5F6; --surface:#FFFFFF; --ink:#12222E; --muted:#566772; --line:#D6DFE3;
+  --accent:#0B6E6B; --accent-ink:#FFFFFF; --accent-soft:#DCEFED;
+  --ok:#1E7A46; --warn:#9A5A05; --crit:#B3261E; --band:#12222E; --band-ink:#E8F0F3; --band-accent:#6FD9D3;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0D1920; --surface:#16252F; --ink:#E8F0F3; --muted:#9AABB6; --line:#2A3C48;
+  --accent:#4FC3BD; --accent-ink:#08201F; --accent-soft:#153B3A;
+  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0A1319; --band-ink:#E8F0F3; --band-accent:#4FC3BD; color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#0D1920; --surface:#16252F; --ink:#E8F0F3; --muted:#9AABB6; --line:#2A3C48;
+  --accent:#4FC3BD; --accent-ink:#08201F; --accent-soft:#153B3A;
+  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0A1319; --band-ink:#E8F0F3; --band-accent:#4FC3BD; color-scheme:dark; }
+
+* { box-sizing:border-box; }
+html { padding-top:env(safe-area-inset-top,0px); }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 var(--body); padding-block:0 28px;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+body.tabs { padding-bottom:92px; }
+h1,h2,h3 { font-family:var(--display); margin:0; line-height:1.2; text-wrap:balance; }
+h1 { font-size:26px; } h2 { font-size:20px; } h3 { font-size:16px; }
+p { margin:0; }
+button,input,select,textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.wrap { max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:14px; padding-block:14px; }
+.muted { color:var(--muted); } .small { font-size:13px; } .mono { font-family:var(--mono); }
+.label { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+
+.top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding-block:10px 0; max-width:720px; margin:0 auto; }
+.brand { display:flex; align-items:center; gap:10px; }
+.logo { width:32px; height:32px; border-radius:9px; background:var(--accent); display:grid; place-items:center; }
+.logo svg { width:20px; height:20px; stroke:var(--accent-ink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.brand b { font-family:var(--display); font-size:17px; }
+.modebar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+.card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px; min-width:0; }
+.card.inner { background:var(--bg); }
+.hero { background:var(--band); color:var(--band-ink); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:10px; }
+.hero .big { font-family:var(--display); font-size:40px; line-height:1; color:var(--band-accent); }
+.row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.between { justify-content:space-between; }
+.grow { flex:1; min-width:0; }
+.stack { display:flex; flex-direction:column; gap:10px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.stat { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+.stat b { font-family:var(--display); font-size:24px; display:block; line-height:1.1; font-variant-numeric:tabular-nums; }
+.stat span { font-size:12px; color:var(--muted); }
+@media (max-width:520px) { .grid2 { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } }
+
+.choice { display:flex; flex-direction:column; gap:6px; text-align:left; width:100%; background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:18px; }
+.choice:hover { border-color:var(--accent); }
+.choice h2 { color:var(--ink); }
+.choice .go { color:var(--accent); font-weight:600; font-size:14px; }
+
+.btn { background:var(--accent); color:var(--accent-ink); border:0; border-radius:10px; padding:10px 16px; font-weight:600; min-height:42px; }
+.btn.ghost { background:transparent; color:var(--accent); border:1px solid var(--line); }
+.btn.danger { background:transparent; color:var(--crit); border:1px solid var(--line); }
+.btn.sm { padding:5px 11px; min-height:32px; font-size:13px; border-radius:8px; }
+.btn[disabled] { opacity:.5; cursor:default; }
+.link { background:none; border:0; color:var(--accent); font-weight:600; padding:4px 0; }
+.field { display:flex; flex-direction:column; gap:4px; }
+.field label { font-size:13px; font-weight:600; }
+.input { background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 12px; min-height:42px; width:100%; }
+textarea.input { min-height:84px; resize:vertical; }
+.pill { display:inline-block; font-size:12px; font-weight:600; padding:2px 9px; border-radius:99px; background:var(--accent-soft); color:var(--accent); white-space:nowrap; }
+.pill.ok { background:color-mix(in srgb,var(--ok) 16%,transparent); color:var(--ok); }
+.pill.warn { background:color-mix(in srgb,var(--warn) 16%,transparent); color:var(--warn); }
+.pill.crit { background:color-mix(in srgb,var(--crit) 16%,transparent); color:var(--crit); }
+.pill.idle { background:color-mix(in srgb,var(--muted) 16%,transparent); color:var(--muted); }
+.seg { display:flex; gap:8px; flex-wrap:wrap; }
+.chip { border:1px solid var(--line); background:var(--surface); border-radius:99px; padding:7px 14px; font-weight:600; font-size:13px; }
+.chip.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.meter { height:8px; border-radius:8px; background:var(--line); overflow:hidden; }
+.meter b { display:block; height:100%; background:var(--accent); }
+.banner { border-radius:12px; padding:10px 14px; font-size:13px; background:var(--accent-soft); border:1px solid var(--line); }
+.banner.warn { background:color-mix(in srgb,var(--warn) 14%,var(--surface)); }
+.err { color:var(--crit); font-size:14px; }
+.demo { font-family:var(--mono); background:var(--bg); border:1px dashed var(--accent); border-radius:10px; padding:10px 12px; font-size:14px; }
+.switch { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.switch input { width:22px; height:22px; accent-color:var(--accent); flex:none; }
+
+.check { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--line); }
+.check:first-of-type { border-top:0; }
+.tick { width:24px; height:24px; border-radius:50%; border:2px solid var(--line); flex:none; display:grid; place-items:center; }
+.tick.done { background:var(--ok); border-color:var(--ok); }
+.tick svg { width:14px; height:14px; stroke:#fff; fill:none; stroke-width:3; display:none; stroke-linecap:round; stroke-linejoin:round; }
+.tick.done svg { display:block; }
+
+.tabbar { position:fixed; left:0; right:0; bottom:0; background:var(--surface); border-top:1px solid var(--line); display:flex; justify-content:center;
+  padding:6px max(8px, env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px, env(safe-area-inset-left,0px)); z-index:20; }
+.tabbar div { display:flex; width:100%; max-width:720px; }
+.tabbar button { flex:1; background:none; border:0; padding:6px 2px; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; font-weight:600; color:var(--muted); border-radius:10px; }
+.tabbar button svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.tabbar button.on { color:var(--accent); }
+.stabs { display:flex; gap:4px; overflow-x:auto; border-bottom:1px solid var(--line); }
+.stabs button { background:none; border:0; border-bottom:3px solid transparent; padding:10px 12px; font-weight:600; color:var(--muted); white-space:nowrap; }
+.stabs button.on { color:var(--accent); border-bottom-color:var(--accent); }
+.q { border:1px solid var(--line); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+.kv { display:grid; grid-template-columns:120px 1fr; gap:4px 12px; font-size:14px; margin:0; }
+.kv dt { color:var(--muted); } .kv dd { margin:0; min-width:0; overflow-wrap:anywhere; }
+.toastbox { position:fixed; left:0; right:0; bottom:calc(92px + env(safe-area-inset-bottom,0px)); display:flex; justify-content:center; pointer-events:none; z-index:30; padding:0 16px; }
+.toast { background:var(--band); color:var(--band-ink); padding:10px 16px; border-radius:12px; font-size:14px; max-width:480px; box-shadow:0 6px 24px rgba(0,0,0,.25); }
+.msgs { display:flex; flex-direction:column; gap:6px; }
+.msg { max-width:88%; padding:8px 12px; border-radius:12px; background:var(--surface); border:1px solid var(--line); font-size:14px; overflow-wrap:anywhere; }
+.msg.me { align-self:flex-end; background:var(--accent-soft); }
+.tlist { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+.scroll { overflow-x:auto; }
+.table { width:100%; border-collapse:collapse; font-size:14px; }
+.table th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+.table td { padding:10px; border-bottom:1px solid var(--line); vertical-align:top; }
+#app:focus { outline:none; }
+.skip { position:absolute; left:-999px; top:0; background:var(--accent); color:var(--accent-ink); padding:8px 14px; border-radius:0 0 8px 8px; z-index:50; }
+.skip:focus { left:16px; }
+hr { border:0; border-top:1px solid var(--line); width:100%; margin:0; }
+body.lg { font-size:17.5px; } body.lg .small { font-size:15px; } body.lg .btn.sm { min-height:40px; font-size:15px; } body.lg .chip { font-size:15px; } body.lg .pill { font-size:13px; }
+.badge { background:var(--crit); color:#fff; border-radius:99px; font-size:10px; font-weight:700; min-width:16px; height:16px; padding:0 4px; display:inline-grid; place-items:center; margin-left:4px; }
+.tabbar button { position:relative; } .tabbar .badge { position:absolute; top:0; left:calc(50% + 6px); margin:0; }
+.crisis { border:1px solid var(--crit); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:8px; background:color-mix(in srgb,var(--crit) 8%,var(--surface)); }
+.qr { display:flex; gap:6px; flex-wrap:wrap; } .qr .chip { font-size:12px; padding:5px 10px; text-align:left; }
+details > summary { cursor:pointer; font-weight:600; } details + details { border-top:1px solid var(--line); padding-top:8px; }
+</style>
+
+<body>
+<a class="skip" href="#app">Skip to main content</a>
+<div class="top" id="top"></div>
+<div class="wrap" id="app" role="main" tabindex="-1"></div>
+<div id="tabs"></div>
+<div class="toastbox" id="toastbox"></div>
+<input type="file" id="docInput" hidden accept="image/*,.pdf">
+
+<script>
+(function () {
+  'use strict';
+  var STANDALONE = true;
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var now = function () { return new Date().toISOString(); };
+  var fmt = function (t) { try { var d = new Date(t); return d.toLocaleDateString((ui && ui.lang === 'fr' ? 'fr-CA' : 'en-CA'), { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString((ui && ui.lang === 'fr' ? 'fr-CA' : 'en-CA'), { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+  var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
+  var byId = function (arr, id) { return arr.filter(function (x) { return x.id === id; })[0]; };
+
+  /* ---------- sha256 (demo sign-in only; see notes in the reply) ---------- */
+  var sha256 = (function () {
+    var K = [], H0 = [];
+    (function () { var n = 2, c = 0; var fr = function (x) { return ((x - Math.floor(x)) * 4294967296) | 0; };
+      while (c < 64) { var p = true; for (var i = 2; i * i <= n; i++) if (n % i === 0) { p = false; break; }
+        if (p) { if (c < 8) H0[c] = fr(Math.pow(n, 0.5)); K[c] = fr(Math.pow(n, 1 / 3)); c++; } n++; } })();
+    var rr = function (x, n) { return (x >>> n) | (x << (32 - n)); };
+    return function (str) {
+      var b = unescape(encodeURIComponent(str)), l = b.length, w = [], i;
+      for (i = 0; i < l; i++) w[i >> 2] = (w[i >> 2] | 0) | (b.charCodeAt(i) << (24 - (i % 4) * 8));
+      w[l >> 2] = (w[l >> 2] | 0) | (0x80 << (24 - (l % 4) * 8));
+      w[(((l + 8) >> 6) + 1) * 16 - 1] = l * 8;
+      var H = H0.slice();
+      for (var j = 0; j < w.length; j += 16) {
+        var a = H.slice(), W = [];
+        for (var t = 0; t < 64; t++) {
+          if (t < 16) W[t] = w[j + t] | 0;
+          else { var g0 = W[t - 15], g1 = W[t - 2]; W[t] = (W[t - 16] + (rr(g0, 7) ^ rr(g0, 18) ^ (g0 >>> 3)) + W[t - 7] + (rr(g1, 17) ^ rr(g1, 19) ^ (g1 >>> 10))) | 0; }
+          var e = a[4], A = a[0];
+          var t1 = (a[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & a[5]) ^ (~e & a[6])) + K[t] + W[t]) | 0;
+          var t2 = ((rr(A, 2) ^ rr(A, 13) ^ rr(A, 22)) + ((A & a[1]) ^ (A & a[2]) ^ (a[1] & a[2]))) | 0;
+          a = [(t1 + t2) | 0, a[0], a[1], a[2], (a[3] + t1) | 0, a[4], a[5], a[6]];
+        }
+        for (t = 0; t < 8; t++) H[t] = (H[t] + a[t]) | 0;
+      }
+      return H.map(function (x) { return ('00000000' + (x >>> 0).toString(16)).slice(-8); }).join('');
+    };
+  })();
+  function hashPw(pw, salt) { var h = sha256(salt + pw); for (var i = 0; i < 400; i++) h = sha256(h + salt + pw); return h; }
+  function rid(n) { var s = '', c = 'abcdefghijklmnopqrstuvwxyz0123456789'; for (var i = 0; i < (n || 10); i++) s += c[Math.floor(Math.random() * c.length)]; return s; }
+
+  /* ---------- reference data (fictional) ---------- */
+  var GROUPS = ['Adults', 'Women & children', 'Families', 'Youth', 'Seniors'];
+  var SERVICES = ['Meals', 'Showers', 'Laundry', 'Case worker on site', 'Counselling referrals', 'Childcare room', 'Transit passes', 'Job coaching', 'Housing navigator', 'Peer support', 'Accessible rooms', 'Pets allowed'];
+  var SAMPLE = [
+    { id: 'sample-s1', kind: 'shelter', name: 'Harbourview Shelter', area: 'Downtown Halifax', available: 6, total: 40, groups: ['Adults'], hours: 'Open 24 hours', phone: '902-555-0111', services: ['Meals', 'Showers', 'Case worker on site'], rules: 'Intake until 10 p.m. Photo ID helpful but not required.' },
+    { id: 'sample-s2', kind: 'shelter', name: 'North End Women’s House', area: 'North End, Halifax', available: 3, total: 22, groups: ['Women & children'], hours: 'Intake 4 p.m. to midnight', phone: '902-555-0124', services: ['Meals', 'Childcare room', 'Counselling referrals'], rules: 'Women and women with children. Call ahead if possible.' },
+    { id: 'sample-s3', kind: 'shelter', name: 'Bedford Basin Family Centre', area: 'Bedford', available: 0, total: 18, groups: ['Families'], hours: 'Intake 9 a.m. to 8 p.m.', phone: '902-555-0138', services: ['Meals', 'Laundry'], rules: 'Families only. Currently full; waitlist open.' },
+    { id: 'sample-s4', kind: 'shelter', name: 'Dartmouth Youth Haven', area: 'Dartmouth', available: 4, total: 16, groups: ['Youth'], hours: 'Open 24 hours', phone: '902-555-0152', services: ['Meals', 'Job coaching', 'Peer support'], rules: 'Ages 16 to 24.' },
+    { id: 'sample-s5', kind: 'shelter', name: 'Cole Harbour Winter Shelter', area: 'Cole Harbour', available: 11, total: 30, groups: ['Adults'], hours: 'Nightly, 6 p.m. to 8 a.m.', phone: '902-555-0166', services: ['Meals', 'Transit passes'], rules: 'Seasonal. Walk-ins welcome.' },
+    { id: 'sample-s6', kind: 'shelter', name: 'Mainland Respite Hub', area: 'Clayton Park', available: 2, total: 12, groups: ['Adults'], hours: 'Open 24 hours', phone: '902-555-0179', services: ['Meals', 'Laundry', 'Housing navigator'], rules: 'Short stays up to 14 nights.' },
+    { id: 'sample-p1', kind: 'housing', name: 'Halifax Community Housing', area: 'Halifax', available: 2, total: 120, groups: ['Adults', 'Families', 'Seniors'], hours: 'Office Mon to Fri, 9 to 4:30', phone: '902-555-0201', services: ['Housing navigator'], rules: 'Rent geared to income.', type: 'Public housing', wait: '14 months' },
+    { id: 'sample-p2', kind: 'housing', name: 'Harbourside Co-op Apartments', area: 'Dartmouth', available: 0, total: 40, groups: ['Adults', 'Families'], hours: 'Office Tue to Thu', phone: '902-555-0212', services: [], rules: 'Members share in running the building.', type: 'Housing co-op', wait: '9 months' },
+    { id: 'sample-p3', kind: 'housing', name: 'Bridge to Home Supportive Housing', area: 'Halifax', available: 3, total: 30, groups: ['Adults'], hours: 'Office Mon to Fri', phone: '902-555-0223', services: ['Case worker on site', 'Peer support'], rules: 'On-site support workers.', type: 'Supportive housing', wait: '5 months' },
+    { id: 'sample-p4', kind: 'housing', name: 'Seaview Rent-Geared Units', area: 'Bedford', available: 1, total: 60, groups: ['Adults', 'Seniors'], hours: 'Office Mon to Fri', phone: '902-555-0234', services: ['Accessible rooms'], rules: 'Includes accessible units.', type: 'Rent-geared', wait: '11 months' }
+  ];
+  var QUESTIONS = [
+    { k: 'q1', t: 'How long have you been without stable housing?', o: [['Under 1 month', 1], ['1 to 6 months', 2], ['6 to 12 months', 3], ['Over 1 year', 4]] },
+    { k: 'q2', t: 'Who is in your household?', o: [['Just me', 1], ['A couple', 2], ['Me and children', 3]] },
+    { k: 'q3', t: 'Do you need an accessible unit?', o: [['No', 0], ['Yes', 2]] },
+    { k: 'q4', t: 'What is your main source of income?', o: [['None right now', 3], ['Benefits or pension', 2], ['Employment', 1]] },
+    { k: 'q5', t: 'Would you like support services in your housing?', o: [['No', 0], ['Yes', 2]] }
+  ];
+  var SITUATIONS = ['Sleeping outside', 'Staying in a shelter', 'Couch surfing', 'At risk of losing housing', 'Other'];
+  var DOCS = ['Photo ID', 'Birth certificate', 'Health card', 'Income letter'];
+  var ACTIONS = { shelter: ['Accepted', 'Waitlisted', 'Declined', 'Checked in'], housing: ['Under review', 'Waitlisted', 'Offer', 'Declined'] };
+  var FILTERS = [['Pending', 'Needs action'], ['all', 'All'], ['Waitlisted', 'Waitlisted'], ['active', 'Accepted'], ['Declined', 'Declined']];
+
+  function score(a) { var t = 0; QUESTIONS.forEach(function (q) { t += +a[q.k] || 0; }); return { total: t, level: t >= 10 ? 'High' : t >= 6 ? 'Medium' : 'Standard' }; }
+  function normPhone(v) { var d = String(v || '').replace(/\D/g, ''); if (d.length === 11 && d[0] === '1') d = d.slice(1); return d.length === 10 ? d : ''; }
+  function showPhone(d) { return d && d.length === 10 ? d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6) : (d || ''); }
+  function normEmail(v) { v = String(v || '').trim().toLowerCase(); return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? v : ''; }
+  function loginKey(idf) { idf = String(idf || '').trim(); if (idf.indexOf('@') >= 0) { var e = normEmail(idf); return e ? sha256('e:' + e) : ''; } var p = normPhone(idf); return p ? sha256('p:' + p) : ''; }
+
+  /* ---------- store: shared (db) or this device only ---------- */
+  var COLL = ['accounts', 'logins', 'people', 'orgs', 'requests', 'feedback'];
+  var mem = { accounts: {}, logins: {}, people: {}, orgs: {}, requests: {}, feedback: {} };
+  var db = null, shared = false, isOwner = false, loading = false;
+  var LS = 'homeconnect-solo-v3', SES = 'homeconnect-session-v3';
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function put(coll, id, obj) {
+    obj = clone(obj); obj.id = id; mem[coll][id] = obj;
+    if (shared) db.doc(coll + '/' + id).set(obj).catch(writeFailed); else lsSet(LS, mem);
+    paint();
+  }
+  function del(coll, id) {
+    delete mem[coll][id];
+    if (shared) db.doc(coll + '/' + id).delete().catch(writeFailed); else lsSet(LS, mem);
+  }
+  function writeFailed(e) {
+    toast(e && (e.code === 'not_granted' || e.code === 'capability_disabled')
+      ? 'You have view-only access, so this was not saved. Ask the owner for Contributor access.'
+      : 'That could not be saved. Check your connection and try again.');
+  }
+  function listen(coll, done) {
+    var first = true;
+    db.collection(coll).onSnapshot(function (snap) {
+      var o = {}; snap.docs.forEach(function (d) { o[d.id] = d.data(); });
+      mem[coll] = o; if (first) { first = false; done(); }
+      paintSoft();
+    }, function () { if (first) { first = false; done(); } });
+  }
+
+  /* ---------- view state ---------- */
+  var ses = lsGet(SES), UIK = 'homeconnect-ui-v3', ui = lsGet(UIK) || {};
+  document.body.classList.toggle('lg', !!ui.lg);
+
+  /* ---------- language (English / French) ---------- */
+  function isFr() { return !!(ui && ui.lang === 'fr'); }
+  var FR = {
+"No account needed": "Aucun compte requis",
+"Open beds tonight": "Lits disponibles ce soir",
+"Call a shelter to confirm before you go. Create an account to send a request and keep your documents in one place.": "Appelez un refuge pour confirmer avant de vous y rendre. Créez un compte pour envoyer une demande et garder vos documents au même endroit.",
+"Need help right now?": "Besoin d’aide tout de suite?",
+"Emergency: danger or a medical emergency": "Urgence : danger ou urgence médicale",
+"Suicide Crisis Helpline, call or text, any time": "Ligne d’aide en cas de crise suicidaire, appel ou texto, en tout temps",
+"Dial 211 to find shelter, food and services in Nova Scotia": "Composez le 211 pour trouver un refuge, de la nourriture et des services en Nouvelle-Écosse",
+"Nova Scotia Mental Health and Addictions Crisis Line": "Ligne de crise en santé mentale et en dépendances de la Nouvelle-Écosse",
+"Kids Help Phone, for young people": "Jeunesse, J’écoute, pour les jeunes",
+"Help right now": "Aide immédiate",
+"Search": "Rechercher",
+"Search by name or area": "Rechercher par nom ou secteur",
+"HomeConnect Canada": "HomeConnect Canada",
+"This device only": "Cet appareil seulement",
+"Shared test": "Test partagé",
+"Larger text": "Texte plus grand",
+"← Start over": "← Recommencer",
+"← Back": "← Retour",
+"Back": "Retour",
+"Working on this device only. To test with friends, open the shared link while signed in to Claude. Everything here is fictional demo data.": "Fonctionne sur cet appareil seulement. Pour tester avec des amis, ouvrez le lien partagé en étant connecté à Claude. Tout ici est fictif et sert de démonstration.",
+"Demo with made-up information only. Accounts and data stay on this device and are not shared. Shelters and providers are fictional.": "Démonstration avec des renseignements inventés seulement. Les comptes et les données restent sur cet appareil et ne sont pas partagés. Les refuges et les fournisseurs sont fictifs.",
+"Shared test: everyone with the link sees the same shelters, requests and rooms.": "Test partagé : toutes les personnes ayant le lien voient les mêmes refuges, demandes et chambres.",
+"Use made-up names and phone numbers only.": "Utilisez seulement des noms et des numéros de téléphone inventés.",
+"Sign-in here is a demo and is not secure.": "La connexion ici est une démonstration et n’est pas sécurisée.",
+"A safe place to start.": "Un endroit sûr pour commencer.",
+"HomeConnect connects people who need housing with the shelters and housing providers who can help.": "HomeConnect met en relation les personnes qui cherchent un logement et les refuges et fournisseurs de logements qui peuvent les aider.",
+"For people": "Pour les personnes",
+"I need housing help": "J’ai besoin d’aide pour me loger",
+"Create an account or sign in to ask for a bed, apply for housing and keep your documents in one place.": "Créez un compte ou connectez-vous pour demander un lit, faire une demande de logement et garder vos documents au même endroit.",
+"Continue →": "Continuer →",
+"For organizations": "Pour les organismes",
+"I offer housing services": "J’offre des services de logement",
+"Shelters and housing providers update rooms, review requests and talk with the people who apply.": "Les refuges et les fournisseurs de logements mettent à jour leurs chambres, examinent les demandes et échangent avec les personnes qui postulent.",
+"Show me open beds tonight": "Montrez-moi les lits disponibles ce soir",
+"See which shelters have space right now and how to reach them.": "Voyez quels refuges ont de la place en ce moment et comment les joindre.",
+"Look now →": "Voir maintenant →",
+"How to test this app with friends": "Comment tester cette application avec des amis",
+"Choose “I need housing help” and create an account with a made-up name and number.": "Choisissez « J’ai besoin d’aide pour me loger » et créez un compte avec un nom et un numéro inventés.",
+"On a second phone or browser window, choose “I offer housing services” and register a shelter, or open the sample organization.": "Sur un deuxième téléphone ou une deuxième fenêtre de navigateur, choisissez « J’offre des services de logement » et inscrivez un refuge, ou ouvrez l’organisme d’exemple.",
+"Send a request from the person account. Accept or decline it from the organization, and send a message.": "Envoyez une demande depuis le compte de la personne. Acceptez-la ou refusez-la depuis l’organisme, puis envoyez un message.",
+"Open Help and send feedback about anything that confused you.": "Ouvrez Aide et envoyez vos commentaires sur tout ce qui vous a semblé confus.",
+"Use made-up names and numbers. Shelters and providers listed are fictional.": "Utilisez des noms et des numéros inventés. Les refuges et fournisseurs listés sont fictifs.",
+"Sign out, then choose “I offer housing services” and register a shelter, or open the sample organization.": "Déconnectez-vous, puis choisissez « J’offre des services de logement » et inscrivez un refuge, ou ouvrez l’organisme d’exemple.",
+"Sign back in as the person and send a request. Then sign in as the organization and accept or decline it.": "Reconnectez-vous en tant que personne et envoyez une demande. Puis connectez-vous en tant qu’organisme et acceptez-la ou refusez-la.",
+"Open Help and send feedback. Use the Administrator link to see everything.": "Ouvrez Aide et envoyez vos commentaires. Utilisez le lien Administrateur pour tout voir.",
+"Privacy and terms": "Confidentialité et conditions",
+"Read Privacy and terms": "Lire la confidentialité et les conditions",
+"Administrator": "Administrateur",
+"Loading…": "Chargement…",
+"Sign out": "Se déconnecter",
+"Aa": "Aa",
+"Shelters": "Refuges",
+"Housing providers": "Fournisseurs de logements",
+"All": "Tous",
+"Adults": "Adultes",
+"Women & children": "Femmes et enfants",
+"Families": "Familles",
+"Youth": "Jeunes",
+"Seniors": "Aînés",
+"Call": "Appeler",
+"Sign up to send a request": "Inscrivez-vous pour envoyer une demande",
+"Hours": "Heures",
+"Phone": "Téléphone",
+"Services": "Services",
+"Good to know": "Bon à savoir",
+"Full": "Complet",
+"Counts are set by each shelter and can change quickly.": "Les chiffres sont établis par chaque refuge et peuvent changer rapidement.",
+"Create an account": "Créer un compte",
+"Find help": "Trouver de l’aide",
+"Details": "Détails",
+"Hide details": "Masquer les détails",
+"Report a problem": "Signaler un problème",
+"Ask for a room": "Demander une chambre",
+"Join waitlist": "Se joindre à la liste d’attente",
+"Send your request": "Envoyer votre demande",
+"How many people?": "Combien de personnes?",
+"I need a place tonight": "J’ai besoin d’un endroit ce soir",
+"I have a pet": "J’ai un animal de compagnie",
+"I need an accessible room or unit": "J’ai besoin d’une chambre ou d’un logement accessible",
+"I agree to share my name, contact details, situation, answers and document list with": "J’accepte de partager mon nom, mes coordonnées, ma situation, mes réponses et ma liste de documents avec",
+"for this request.": "pour cette demande.",
+"Anything they should know? (optional)": "Autre chose à leur signaler? (facultatif)",
+"Send": "Envoyer",
+"Cancel": "Annuler",
+"Tick the box to agree to share your details first.": "Cochez d’abord la case pour accepter de partager vos renseignements.",
+"Housing application": "Demande de logement",
+"Send your application": "Envoyer votre demande de logement",
+"Apply": "Postuler",
+"Not listed": "Non listé",
+"Listed": "Listé",
+"Nothing matches. Try another group or clear the search.": "Aucun résultat. Essayez un autre groupe ou effacez la recherche.",
+"Address": "Adresse",
+"Shared with you once your request is accepted": "Communiquée une fois votre demande acceptée",
+"Public housing": "Logement public",
+"Housing co-op": "Coopérative d’habitation",
+"Supportive housing": "Logement avec soutien",
+"Rent-geared": "Loyer proportionné au revenu",
+"Nightly, 6 p.m. to 8 a.m.": "Chaque nuit, de 18 h à 8 h",
+"Meals, Transit passes": "Repas, Laissez-passer de transport",
+"Seasonal. Walk-ins welcome.": "Saisonnier. Sans rendez-vous bienvenu.",
+"Open 24 hours": "Ouvert 24 heures sur 24",
+"Meals, Showers, Case worker on site": "Repas, Douches, Intervenant sur place",
+"Intake until 10 p.m. Photo ID helpful but not required.": "Accueil jusqu’à 22 h. Une pièce d’identité avec photo est utile, mais pas obligatoire.",
+"Meals, Job coaching, Peer support": "Repas, Accompagnement à l’emploi, Soutien par les pairs",
+"Ages 16 to 24.": "Pour les 16 à 24 ans.",
+"Intake 4 p.m. to midnight": "Accueil de 16 h à minuit",
+"Meals, Childcare room, Counselling referrals": "Repas, Salle de garde d’enfants, Aiguillage vers du counseling",
+"Women and women with children. Call ahead if possible.": "Femmes et femmes avec enfants. Appelez à l’avance si possible.",
+"Meals, Laundry, Housing navigator": "Repas, Buanderie, Guide en logement",
+"Short stays up to 14 nights.": "Séjours courts, jusqu’à 14 nuits.",
+"Intake 9 a.m. to 8 p.m.": "Accueil de 9 h à 20 h",
+"Meals, Laundry": "Repas, Buanderie",
+"Families only. Currently full; waitlist open.": "Familles seulement. Actuellement complet; liste d’attente ouverte.",
+"Office Mon to Fri": "Bureau du lundi au vendredi",
+"Office Mon to Fri, 9 to 4:30": "Bureau du lundi au vendredi, de 9 h à 16 h 30",
+"Office Tue to Thu": "Bureau du mardi au jeudi",
+"Case worker on site, Peer support": "Intervenant sur place, Soutien par les pairs",
+"Housing navigator": "Guide en logement",
+"On-site support workers.": "Intervenants de soutien sur place.",
+"Rent geared to income.": "Loyer proportionné au revenu.",
+"Members share in running the building.": "Les membres participent à la gestion de l’immeuble.",
+"Includes accessible units.": "Comprend des logements accessibles.",
+"Accessible rooms": "Chambres accessibles",
+"Meals": "Repas",
+"Showers": "Douches",
+"Laundry": "Buanderie",
+"Case worker on site": "Intervenant sur place",
+"Counselling referrals": "Aiguillage vers du counseling",
+"Childcare room": "Salle de garde d’enfants",
+"Transit passes": "Laissez-passer de transport",
+"Job coaching": "Accompagnement à l’emploi",
+"Peer support": "Soutien par les pairs",
+"Pets allowed": "Animaux acceptés",
+"Can arrive after 8 p.m.": "Peut arriver après 20 h",
+"Organizations": "Organismes",
+"Create account": "Créer un compte",
+"Join your team": "Joindre votre équipe",
+"Sign in": "Se connecter",
+"Register your organization": "Inscrire votre organisme",
+"This creates your organization page and the login you will use to manage it. You can add colleagues later.": "Cela crée la page de votre organisme et l’identifiant que vous utiliserez pour la gérer. Vous pourrez ajouter des collègues plus tard.",
+"Organization name": "Nom de l’organisme",
+"What do you offer?": "Qu’offrez-vous?",
+"Shelter (beds or rooms)": "Refuge (lits ou chambres)",
+"Housing provider (units)": "Fournisseur de logements (logements)",
+"Area or neighbourhood": "Secteur ou quartier",
+"Total rooms or units": "Nombre total de chambres ou de logements",
+"Available right now": "Disponibles en ce moment",
+"Who do you serve?": "Qui servez-vous?",
+"Your login": "Votre connexion",
+"Your name": "Votre nom",
+"Phone number": "Numéro de téléphone",
+"Email (optional if you gave a number)": "Courriel (facultatif si vous avez donné un numéro)",
+"Password (8 or more characters)": "Mot de passe (8 caractères ou plus)",
+"I am allowed to act for this organization. I agree to the": "Je suis autorisé à agir pour cet organisme. J’ai lu et j’accepte :",
+"Register organization": "Inscrire l’organisme",
+"e.g. Harbour Light Shelter": "p. ex. Refuge Harbour Light",
+"e.g. Dartmouth": "p. ex. Dartmouth",
+"One last step": "Une dernière étape",
+"Save your recovery code": "Conservez votre code de récupération",
+"If you forget your password, this code lets you reset it yourself. It cannot be shown again. Write it down or take a screenshot, and keep it somewhere safe.": "Si vous oubliez votre mot de passe, ce code vous permet de le réinitialiser vous-même. Il ne pourra plus être affiché. Notez-le ou prenez une capture d’écran, et gardez-le en lieu sûr.",
+"Copy code": "Copier le code",
+"I saved it, continue": "Je l’ai conservé, continuer",
+"Organization registered.": "Organisme inscrit.",
+"Shelter": "Refuge",
+"Awaiting verification": "En attente de vérification",
+"Overview": "Aperçu",
+"Requests": "Demandes",
+"Services and listing": "Services et fiche",
+"Team": "Équipe",
+"Verify a person": "Vérifier une personne",
+"Need action": "À traiter",
+"Accepted": "Accepté",
+"Waitlisted": "Sur liste d’attente",
+"New this week": "Nouvelles cette semaine",
+"Rooms available": "Chambres disponibles",
+"Units available": "Logements disponibles",
+"Total rooms": "Total de chambres",
+"Total units": "Total de logements",
+"Update total": "Mettre à jour le total",
+"Accepting new requests": "Accepte de nouvelles demandes",
+"Not accepting": "N’accepte pas",
+"Turn off to pause new requests without hiding your listing.": "Désactivez pour suspendre les nouvelles demandes sans masquer votre fiche.",
+"Announcement": "Annonce",
+"Shown on your listing. For example, intake times tonight or items you need.": "Affichée sur votre fiche. Par exemple, les heures d’accueil ce soir ou les articles dont vous avez besoin.",
+"Post announcement": "Publier l’annonce",
+"Recent activity": "Activité récente",
+"Organization registered": "Organisme inscrit",
+"One fewer available": "Une de moins disponible",
+"One more available": "Une de plus disponible",
+"Short notice for people searching": "Court avis pour les personnes qui cherchent",
+"Ask the person who registered your organization for the team code. You will find it under Team.": "Demandez le code d’équipe à la personne qui a inscrit votre organisme. Vous le trouverez sous Équipe.",
+"Team code": "Code d’équipe",
+"Join team": "Joindre l’équipe",
+"e.g. K7P2QX": "p. ex. K7P2QX",
+"That team code was not found. Check it with the person who registered your organization.": "Ce code d’équipe est introuvable. Vérifiez-le auprès de la personne qui a inscrit votre organisme.",
+"Share this code with colleagues. When they create an account they choose “Join your team” and enter it.": "Partagez ce code avec vos collègues. Lorsqu’ils créent un compte, ils choisissent « Joindre votre équipe » et l’entrent.",
+"People with access": "Personnes ayant accès",
+"Name": "Nom",
+"Contact": "Coordonnées",
+"Role": "Rôle",
+"Owner": "Propriétaire",
+"Staff": "Personnel",
+"Make a new code": "Créer un nouveau code",
+"Look someone up by their exact phone number or email, check their ID in person, then confirm. Each lookup is recorded on their profile.": "Cherchez une personne par son numéro de téléphone ou son courriel exact, vérifiez son identité en personne, puis confirmez. Chaque recherche est consignée dans son profil.",
+"Look up": "Rechercher",
+"Phone number or email": "Numéro de téléphone ou courriel",
+"No account with that number or email.": "Aucun compte avec ce numéro ou ce courriel.",
+"I checked their ID, mark verified": "J’ai vérifié leur pièce d’identité, marquer comme vérifié",
+"Already verified": "Déjà vérifié",
+"Marked as verified.": "Marqué comme vérifié.",
+"Needs action": "À traiter",
+"Declined": "Refusé",
+"Download CSV": "Télécharger en CSV",
+"Not assessed": "Non évalué",
+"High priority": "Priorité élevée",
+"Medium priority": "Priorité moyenne",
+"Standard priority": "Priorité standard",
+"Needs a place tonight": "A besoin d’un endroit ce soir",
+"Has a pet": "A un animal de compagnie",
+"Needs accessible": "A besoin d’un accès adapté",
+"Needs place tonight": "A besoin d’un endroit ce soir",
+"Profile and messages": "Profil et messages",
+"Checked in": "Arrivé",
+"Hide": "Masquer",
+"No": "Non",
+"Yes": "Oui",
+"Assessment": "Évaluation",
+"Not done": "Non fait",
+"Documents": "Documents",
+"No messages yet.": "Aucun message pour le moment.",
+"Private staff note (the person cannot see this)": "Note privée du personnel (la personne ne peut pas la voir)",
+"Save note": "Enregistrer la note",
+"Write a message": "Écrire un message",
+"Message": "Message",
+"Note saved.": "Note enregistrée.",
+"Nothing here. New requests from people appear here.": "Rien ici. Les nouvelles demandes des personnes apparaissent ici.",
+"Nothing here. Try another filter.": "Rien ici. Essayez un autre filtre.",
+"Reason (the person will see this)": "Motif (la personne le verra)",
+"Decline request": "Refuser la demande",
+"e.g. We only serve women and children": "p. ex. Nous servons seulement les femmes et les enfants",
+"Reason given:": "Motif donné :",
+"Under review": "En cours d’examen",
+"Offer": "Offre",
+"Offers": "Offres",
+"Withdrawn": "Retirée",
+"Pending": "En attente",
+"This person withdrew their request and no longer shares details.": "Cette personne a retiré sa demande et ne partage plus ses renseignements.",
+"Shared only when the person sends you a request.": "Partagé seulement lorsque la personne vous envoie une demande.",
+"Review the waitlist": "Examiner la liste d’attente",
+"Address made public": "Adresse rendue publique",
+"Address set to private": "Adresse rendue privée",
+"Listing updated": "Fiche mise à jour",
+"Paused": "En pause",
+"Started": "Démarré",
+"This is what people see when they search.": "Voici ce que les gens voient lorsqu’ils cherchent.",
+"Area": "Secteur",
+"Street address (optional)": "Adresse (facultatif)",
+"Public email": "Courriel public",
+"Hours and intake times": "Heures et heures d’accueil",
+"About us": "À propos de nous",
+"Intake rules and what to bring": "Règles d’accueil et quoi apporter",
+"Keep my address private": "Garder mon adresse privée",
+"Recommended for shelters that must stay confidential. People see the address only after you accept their request.": "Recommandé pour les refuges qui doivent demeurer confidentiels. Les gens ne voient l’adresse qu’après que vous avez accepté leur demande.",
+"Who we serve": "Qui nous servons",
+"Services we offer": "Services que nous offrons",
+"Save listing": "Enregistrer la fiche",
+"Account": "Compte",
+"Listing saved.": "Fiche enregistrée.",
+"Your listing is suspended by the administrator and is hidden from people searching.": "Votre fiche est suspendue par l’administrateur et est masquée aux personnes qui cherchent.",
+"Housing help": "Aide au logement",
+"Create your account": "Créer votre compte",
+"Use a phone number, an email, or both. You will use either one to sign in.": "Utilisez un numéro de téléphone, un courriel, ou les deux. Vous pourrez utiliser l’un ou l’autre pour vous connecter.",
+"Mobile number": "Numéro de cellulaire",
+"Where are you staying right now?": "Où logez-vous en ce moment?",
+"Choose one": "Choisissez-en un",
+"Sleeping outside": "Je dors dehors",
+"Staying in a shelter": "Je suis dans un refuge",
+"Couch surfing": "Je dors chez des amis ou de la famille",
+"At risk of losing housing": "Je risque de perdre mon logement",
+"Other": "Autre",
+"Language you prefer to be helped in": "Langue dans laquelle vous préférez être aidé",
+"I am 16 or older, or a worker is helping me. I agree to the": "J’ai 16 ans ou plus, ou un intervenant m’aide. J’ai lu et j’accepte :",
+"Use a made-up name to test": "Utilisez un nom inventé pour tester",
+"Account created. Welcome.": "Compte créé. Bienvenue.",
+"Find a room": "Trouver une chambre",
+"Not verified yet": "Pas encore vérifié",
+"Next steps": "Prochaines étapes",
+"Verify who you are": "Vérifier votre identité",
+"A code, or in person with a worker.": "Par un code, ou en personne avec un intervenant.",
+"Verify": "Vérifier",
+"Answer 5 short questions": "Répondre à 5 courtes questions",
+"Helps providers understand your situation.": "Aide les fournisseurs à comprendre votre situation.",
+"Start": "Commencer",
+"Add your photo ID to the vault": "Ajouter votre pièce d’identité avec photo au coffre",
+"Keeps it ready for requests.": "La garde prête pour vos demandes.",
+"Open vault": "Ouvrir le coffre",
+"Ask a shelter for a room": "Demander une chambre à un refuge",
+"See what is open tonight.": "Voyez ce qui est disponible ce soir.",
+"Apply for housing": "Faire une demande de logement",
+"Apply once, follow progress here.": "Postulez une fois, suivez l’avancement ici.",
+"Browse": "Parcourir",
+"Updates": "Mises à jour",
+"Nothing yet. When an organization responds, you will see it here.": "Rien pour l’instant. Quand un organisme répond, vous le verrez ici.",
+"Home": "Accueil",
+"Find": "Trouver",
+"Vault": "Coffre",
+"Help": "Aide",
+"Profile": "Profil",
+"Main": "Principal",
+"Verify your identity": "Vérifier votre identité",
+"Send me a code": "M’envoyer un code",
+"No phone? Visit a shelter and ask a worker to verify you in person.": "Pas de téléphone? Rendez-vous dans un refuge et demandez à un intervenant de vous vérifier en personne.",
+"Demo mode: no real message is sent. Your code is": "Mode démonstration : aucun vrai message n’est envoyé. Votre code est",
+"Enter the code": "Entrez le code",
+"Confirm": "Confirmer",
+"That code does not match. Try again.": "Ce code ne correspond pas. Réessayez.",
+"A few questions": "Quelques questions",
+"Answers go only to organizations you send a request to.": "Les réponses sont transmises seulement aux organismes à qui vous envoyez une demande.",
+"How long have you been without stable housing?": "Depuis combien de temps êtes-vous sans logement stable?",
+"Under 1 month": "Moins de 1 mois",
+"1 to 6 months": "1 à 6 mois",
+"6 to 12 months": "6 à 12 mois",
+"Over 1 year": "Plus de 1 an",
+"Who is in your household?": "Qui compose votre ménage?",
+"Just me": "Moi seulement",
+"A couple": "Un couple",
+"Me and children": "Moi et des enfants",
+"Do you need an accessible unit?": "Avez-vous besoin d’un logement accessible?",
+"What is your main source of income?": "Quelle est votre principale source de revenu?",
+"None right now": "Aucune en ce moment",
+"Benefits or pension": "Prestations ou pension",
+"Employment": "Emploi",
+"Would you like support services in your housing?": "Souhaitez-vous des services de soutien dans votre logement?",
+"Save answers": "Enregistrer les réponses",
+"Not said": "Non précisé",
+"Redo questions": "Refaire les questions",
+"Your assessment": "Votre évaluation",
+"Request sent to": "Demande envoyée à",
+"My requests": "Mes demandes",
+"New": "Nouveau",
+"Good news.": "Bonne nouvelle.",
+"No requests yet. Go to Find to ask a shelter for a room or apply for housing.": "Aucune demande pour le moment. Allez à Trouver pour demander une chambre à un refuge ou postuler à un logement.",
+"Messages and history": "Messages et historique",
+"You can ask another shelter or provider under Find.": "Vous pouvez demander à un autre refuge ou fournisseur sous Trouver.",
+"Document vault": "Coffre de documents",
+"In this test only the": "Dans ce test, seul le",
+"file name": "nom du fichier",
+"is kept. The file stays on your device.": "est conservé. Le fichier reste sur votre appareil.",
+"Photo ID": "Pièce d’identité avec photo",
+"Birth certificate": "Certificat de naissance",
+"Health card": "Carte d’assurance-maladie",
+"Income letter": "Lettre de revenu",
+"Nothing added": "Rien d’ajouté",
+"Missing": "Manquant",
+"Add file": "Ajouter un fichier",
+"Replace": "Remplacer",
+"Remove": "Retirer",
+"What to bring to a shelter": "Quoi apporter dans un refuge",
+"Photo ID if you have it. Most shelters will still help without it.": "Une pièce d’identité avec photo si vous en avez une. La plupart des refuges vous aideront quand même sans elle.",
+"Health card and any medication": "Carte d’assurance-maladie et tout médicament",
+"Your phone and charger": "Votre téléphone et son chargeur",
+"Letters about income or benefits": "Lettres au sujet du revenu ou des prestations",
+"What you need for children or pets": "Ce dont vous avez besoin pour les enfants ou les animaux",
+"Common questions": "Questions fréquentes",
+"I forgot my password.": "J’ai oublié mon mot de passe.",
+"On the sign-in screen tap “Forgot password?”. Enter the recovery code you saved when you made your account. If you lost it, ask for a reset and the administrator will give you a temporary password.": "Sur l’écran de connexion, touchez « Mot de passe oublié? ». Entrez le code de récupération que vous avez conservé en créant votre compte. Si vous l’avez perdu, demandez une réinitialisation et l’administrateur vous donnera un mot de passe temporaire.",
+"Is HomeConnect free?": "HomeConnect est-il gratuit?",
+"Yes. It is free for people looking for housing.": "Oui. C’est gratuit pour les personnes qui cherchent un logement.",
+"Who can see my information?": "Qui peut voir mes renseignements?",
+"What does “verified” mean?": "Que signifie « vérifié »?",
+"A worker or a code confirmed it is really you. Verified profiles are easier for organizations to trust. It does not decide whether you get a room.": "Un intervenant ou un code a confirmé que c’est bien vous. Les profils vérifiés inspirent plus facilement confiance aux organismes. Cela ne décide pas si vous obtenez une chambre.",
+"What does priority mean?": "Que signifie la priorité?",
+"Your five answers give a simple priority level. Organizations use it to sort requests. It never decides on its own, and people can still be helped at any level.": "Vos cinq réponses donnent un niveau de priorité simple. Les organismes l’utilisent pour trier les demandes. Elle ne décide jamais à elle seule, et chacun peut être aidé à tout niveau.",
+"I do not have a phone or email.": "Je n’ai ni téléphone ni courriel.",
+"Tap “Show me open beds tonight” on the first screen. You do not need an account to see which shelters have space and how to call them. A shelter worker can also help you create an account.": "Touchez « Montrez-moi les lits disponibles ce soir » sur le premier écran. Aucun compte n’est nécessaire pour voir quels refuges ont de la place et comment les appeler. Un intervenant de refuge peut aussi vous aider à créer un compte.",
+"A shelter says no. What now?": "Un refuge dit non. Et maintenant?",
+"Try another shelter under Find, call 211, or ask a worker to help you. A no from one place is not a no from everyone.": "Essayez un autre refuge sous Trouver, appelez le 211 ou demandez l’aide d’un intervenant. Un non d’un endroit n’est pas un non de tous.",
+"How your information is used, and your choices.": "Comment vos renseignements sont utilisés, et vos choix.",
+"Send feedback": "Envoyer des commentaires",
+"Tell us what worked, what confused you, or report a problem. The administrator reads every note.": "Dites-nous ce qui a fonctionné, ce qui vous a semblé confus, ou signalez un problème. L’administrateur lit chaque message.",
+"Type": "Type",
+"Feedback": "Commentaires",
+"Idea": "Idée",
+"Problem with the app": "Problème avec l’application",
+"Problem with a listing": "Problème avec une fiche",
+"Your message": "Votre message",
+"Thank you. Your note was sent.": "Merci. Votre message a été envoyé.",
+"Write a message first.": "Écrivez d’abord un message.",
+"Email": "Courriel",
+"Not added": "Non ajouté",
+"Situation": "Situation",
+"Language": "Langue",
+"Verified": "Vérifié",
+"Not yet": "Pas encore",
+"Edit details": "Modifier les détails",
+"Answer questions": "Répondre aux questions",
+"Who can see your information": "Qui peut voir vos renseignements",
+"These organizations can see your details because you sent them a request. Withdraw a request to stop sharing.": "Ces organismes peuvent voir vos renseignements parce que vous leur avez envoyé une demande. Retirez une demande pour arrêter le partage.",
+"Withdraw and stop sharing": "Retirer et arrêter le partage",
+"Who has looked you up": "Qui vous a recherché",
+"No one yet.": "Personne pour l’instant.",
+"Your information": "Vos renseignements",
+"Download a copy": "Télécharger une copie",
+"Change password": "Changer le mot de passe",
+"Current password": "Mot de passe actuel",
+"New password (8 or more characters)": "Nouveau mot de passe (8 caractères ou plus)",
+"Make a new recovery code": "Créer un nouveau code de récupération",
+"Enter your current password above first. A new recovery code replaces the old one.": "Entrez d’abord votre mot de passe actuel ci-dessus. Un nouveau code de récupération remplace l’ancien.",
+"Delete my account": "Supprimer mon compte",
+"Removes your account, profile and requests.": "Supprime votre compte, votre profil et vos demandes.",
+"Yes, delete everything": "Oui, tout supprimer",
+"Your current password is not right.": "Votre mot de passe actuel n’est pas le bon.",
+"Password changed.": "Mot de passe changé.",
+"Enter your current password first.": "Entrez d’abord votre mot de passe actuel.",
+"Save": "Enregistrer",
+"Details saved.": "Détails enregistrés.",
+"To change your phone number or email, ask the administrator through Help.": "Pour changer votre numéro de téléphone ou votre courriel, demandez à l’administrateur par l’entremise d’Aide.",
+"No organization has your details.": "Aucun organisme n’a vos renseignements.",
+"Password": "Mot de passe",
+"Forgot password?": "Mot de passe oublié?",
+"Want to look around first?": "Envie de regarder d’abord?",
+"Try a sample organization": "Essayer un organisme d’exemple",
+"you@example.com or 902-555-0100": "vous@exemple.com ou 902-555-0100",
+"you@example.com": "vous@exemple.com",
+"office@example.org": "bureau@exemple.org",
+"902-555-0100 or name@example.com": "902-555-0100 ou nom@exemple.com",
+"Signed in.": "Connecté.",
+"Reset your password": "Réinitialiser votre mot de passe",
+"Enter the phone number or email you signed up with, the recovery code you saved when you made your account, and a new password.": "Entrez le numéro de téléphone ou le courriel avec lequel vous vous êtes inscrit, le code de récupération conservé à la création de votre compte, et un nouveau mot de passe.",
+"Recovery code": "Code de récupération",
+"Reset password": "Réinitialiser le mot de passe",
+"I do not have my code": "Je n’ai pas mon code",
+"Ask for help instead. The administrator can give you a temporary password.": "Demandez plutôt de l’aide. L’administrateur peut vous donner un mot de passe temporaire.",
+"Ask for a reset": "Demander une réinitialisation",
+"Back to sign in": "Retour à la connexion",
+"That recovery code does not match. If you lost it, use “Ask for a reset” below.": "Ce code de récupération ne correspond pas. Si vous l’avez perdu, utilisez « Demander une réinitialisation » ci-dessous.",
+"Password reset. You are signed in.": "Mot de passe réinitialisé. Vous êtes connecté.",
+"Thank you. If that account exists, the administrator has been told. Check back soon, or ask your organization owner or the person who invited you.": "Merci. Si ce compte existe, l’administrateur en a été informé. Revenez bientôt, ou demandez au propriétaire de votre organisme ou à la personne qui vous a invité.",
+"That phone number, email or password is not right. If you forgot your password, ask the administrator or your organization owner to reset it.": "Ce numéro de téléphone, ce courriel ou ce mot de passe n’est pas le bon. Si vous avez oublié votre mot de passe, demandez à l’administrateur ou au propriétaire de votre organisme de le réinitialiser.",
+"Too many tries. Wait a minute and try again.": "Trop de tentatives. Attendez une minute et réessayez.",
+"Administrators see every account, organization and request, and can verify or suspend organizations. In this test there is no password, so anyone using this device can open it.": "Les administrateurs voient tous les comptes, organismes et demandes, et peuvent vérifier ou suspendre des organismes. Dans ce test, il n’y a pas de mot de passe : toute personne utilisant cet appareil peut l’ouvrir.",
+"Open administrator console": "Ouvrir la console d’administration",
+"Everything in HomeConnect": "Tout dans HomeConnect",
+"People": "Personnes",
+"Rooms and units open": "Chambres et logements libres",
+"All requests": "Toutes les demandes",
+"Accounts": "Comptes",
+"Tools": "Outils",
+"Not verified": "Non vérifié",
+"Mark verified": "Marquer comme vérifié",
+"Remove verified badge": "Retirer le badge de vérification",
+"Suspend listing": "Suspendre la fiche",
+"Restore listing": "Rétablir la fiche",
+"Suspended": "Suspendu",
+"Restore": "Rétablir",
+"Demo people and requests": "Personnes et demandes de démonstration",
+"Adds four fictional people with requests to the listed organizations, so every organization has something to review while you test. Demo people have no login.": "Ajoute quatre personnes fictives avec des demandes aux organismes listés, afin que chaque organisme ait quelque chose à examiner pendant vos essais. Les personnes de démonstration n’ont pas d’identifiant.",
+"Add demo data": "Ajouter des données de démonstration",
+"Remove demo data": "Retirer les données de démonstration",
+"Exports": "Exportations",
+"All requests (CSV)": "Toutes les demandes (CSV)",
+"All accounts (CSV)": "Tous les comptes (CSV)",
+"Demo people and requests added.": "Personnes et demandes de démonstration ajoutées.",
+"Demo data removed.": "Données de démonstration retirées.",
+"Password reset request": "Demande de réinitialisation du mot de passe",
+"Reset their password": "Réinitialiser leur mot de passe",
+"Mark done": "Marquer comme fait",
+"Created": "Créé",
+"org": "organisme",
+"person": "personne",
+"Disable": "Désactiver",
+"Enable": "Activer",
+"Disabled": "Désactivé",
+"Temporary password for": "Mot de passe temporaire pour",
+". Share it privately and ask them to change it under Profile.": ". Communiquez-le en privé et demandez-leur de le changer sous Profil.",
+". Share it privately and ask them to change it under Services and listing.": ". Communiquez-le en privé et demandez-leur de le changer sous Services et fiche.",
+"Status": "Statut",
+"Sent": "Envoyée",
+"Requested": "Demandé",
+"Updated": "Mis à jour",
+"No accounts yet.": "Aucun compte pour le moment.",
+"No people yet.": "Aucune personne pour le moment.",
+"No team accounts yet.": "Aucun compte d’équipe pour le moment.",
+"No feedback yet. Testers can send it from the Help tab or the organization Services tab.": "Aucun commentaire pour le moment. Les testeurs peuvent en envoyer depuis l’onglet Aide ou l’onglet Services de l’organisme.",
+"Test version.": "Version d’essai.",
+"This notice is a plain-language draft. Before real clients use the app, a lawyer and your privacy officer should review and finish it.": "Cet avis est une ébauche en langage clair. Avant que de vraies personnes utilisent l’application, un avocat et votre responsable de la protection de la vie privée devraient le réviser et le compléter.",
+"What this app is": "Ce qu’est cette application",
+"HomeConnect helps people find a shelter bed or housing and lets organizations respond. In this test, everything is made up. Please do not enter real names, numbers or documents.": "HomeConnect aide les gens à trouver un lit en refuge ou un logement et permet aux organismes de répondre. Dans ce test, tout est inventé. Veuillez ne pas entrer de vrais noms, numéros ou documents.",
+"What we keep": "Ce que nous conservons",
+"Your name, phone number and/or email, where you are staying, and the language you prefer.": "Votre nom, votre numéro de téléphone ou votre courriel, l’endroit où vous logez et la langue que vous préférez.",
+"Your answers to five short questions and the names of documents you list (not the files).": "Vos réponses à cinq courtes questions et les noms des documents que vous listez (pas les fichiers).",
+"Your requests and messages. For organizations: your listing, rooms available, and your staff’s names and contact details.": "Vos demandes et messages. Pour les organismes : votre fiche, les chambres disponibles, ainsi que les noms et coordonnées de votre personnel.",
+"Why we keep it": "Pourquoi nous le conservons",
+"To show you shelters and housing, to let an organization answer your request, and to keep the service safe. We do not sell your information and we do not use it for advertising.": "Pour vous montrer des refuges et des logements, permettre à un organisme de répondre à votre demande et assurer la sécurité du service. Nous ne vendons pas vos renseignements et ne les utilisons pas à des fins publicitaires.",
+"Who can see it": "Qui peut le voir",
+"An organization sees your name, contact details, situation, answers and document list only after you send it a request and agree to share with it. If you withdraw the request, they lose access to those details.": "Un organisme voit votre nom, vos coordonnées, votre situation, vos réponses et votre liste de documents seulement après que vous lui avez envoyé une demande et accepté de partager avec lui. Si vous retirez la demande, il perd l’accès à ces renseignements.",
+"An organization that looks you up to verify you in person sees only whether you are verified.": "Un organisme qui vous recherche pour vous vérifier en personne voit seulement si vous êtes vérifié.",
+"Administrators can see everything, for support and safety.": "Les administrateurs peuvent tout voir, pour le soutien et la sécurité.",
+"Your choices": "Vos choix",
+"Withdraw a request any time under Requests to stop sharing with that organization.": "Retirez une demande en tout temps sous Demandes pour arrêter le partage avec cet organisme.",
+"Edit your details, download a copy of your information, or delete your account under Profile.": "Modifiez vos détails, téléchargez une copie de vos renseignements ou supprimez votre compte sous Profil.",
+"Ask for help with anything else through Help, then Send feedback.": "Demandez de l’aide pour tout le reste par Aide, puis Envoyer des commentaires.",
+"How long we keep it": "Combien de temps nous le conservons",
+"In this test, until you delete your account or test data is cleared. Before launch, a clear retention period will be set and shown here.": "Dans ce test, jusqu’à ce que vous supprimiez votre compte ou que les données d’essai soient effacées. Avant le lancement, une durée de conservation claire sera fixée et affichée ici.",
+"Where it is stored": "Où c’est stocké",
+"In this test, either on your own device or in the shared test database of the page. Before launch it will be stored in Canada and this notice will say so. This page uses your browser’s local storage to keep you signed in. It has no advertising or tracking.": "Dans ce test, soit sur votre propre appareil, soit dans la base de données d’essai partagée de la page. Avant le lancement, ce sera stocké au Canada et cet avis le précisera. Cette page utilise le stockage local de votre navigateur pour vous garder connecté. Elle n’a ni publicité ni suivi.",
+"Rules for using it": "Règles d’utilisation",
+"Use it honestly. Do not harass anyone or enter someone else’s information.": "Utilisez-la honnêtement. Ne harcelez personne et n’entrez pas les renseignements d’une autre personne.",
+"Organizations must keep what they learn confidential and use it only to help the person.": "Les organismes doivent garder confidentiel ce qu’ils apprennent et l’utiliser seulement pour aider la personne.",
+"Counts of rooms are set by each organization and can change. Space is never guaranteed.": "Le nombre de chambres est établi par chaque organisme et peut changer. Une place n’est jamais garantie.",
+"This is not an emergency service. In danger, call 911.": "Ce n’est pas un service d’urgence. En cas de danger, composez le 911.",
+"Sign-in in this test is a demo and is not secure enough for real clients.": "La connexion dans ce test est une démonstration et n’est pas assez sécurisée pour de vraies personnes.",
+"Who to contact": "Qui contacter",
+"Privacy officer: to be named before launch. For now, use Help, then Send feedback.": "Responsable de la protection de la vie privée : sera nommé avant le lancement. Pour l’instant, utilisez Aide, puis Envoyer des commentaires.",
+"Enter a phone number or an email.": "Entrez un numéro de téléphone ou un courriel.",
+"Enter your organization’s name.": "Entrez le nom de votre organisme.",
+"Enter your name.": "Entrez votre nom.",
+"Enter the phone number or email you signed up with.": "Entrez le numéro de téléphone ou le courriel avec lequel vous vous êtes inscrit.",
+"Enter the phone number or email you signed up with, so we know who to help.": "Entrez le numéro de téléphone ou le courriel avec lequel vous vous êtes inscrit, pour que nous sachions qui aider.",
+"Please tick the box to agree to the Privacy and terms.": "Veuillez cocher la case pour accepter la confidentialité et les conditions.",
+"Choose a new password with at least 8 characters.": "Choisissez un nouveau mot de passe d’au moins 8 caractères.",
+"Choose a password with at least 8 characters.": "Choisissez un mot de passe d’au moins 8 caractères.",
+"The new password needs at least 8 characters.": "Le nouveau mot de passe doit comporter au moins 8 caractères.",
+"An account already uses that phone number or email. Try signing in.": "Un compte utilise déjà ce numéro de téléphone ou ce courriel. Essayez de vous connecter.",
+"Enter a 10-digit phone number, or leave it empty.": "Entrez un numéro de téléphone à 10 chiffres, ou laissez le champ vide.",
+"Enter a phone number, an email, or both.": "Entrez un numéro de téléphone, un courriel, ou les deux.",
+"Enter how many rooms or units you have in total.": "Entrez le nombre total de chambres ou de logements que vous avez.",
+"That email does not look right.": "Ce courriel ne semble pas valide.",
+"Name cannot be empty.": "Le nom ne peut pas être vide.",
+"That file is over 10 MB.": "Ce fichier dépasse 10 Mo.",
+"Downloads are not available here.": "Les téléchargements ne sont pas disponibles ici.",
+"The download did not work here.": "Le téléchargement n’a pas fonctionné ici.",
+"Code copied.": "Code copié.",
+"Could not copy. Write the code down instead.": "Copie impossible. Notez plutôt le code.",
+"Available cannot be more than the total.": "Le nombre disponible ne peut pas dépasser le total.",
+"Enter a number.": "Entrez un nombre.",
+"Total updated.": "Total mis à jour.",
+"Announcement updated": "Annonce mise à jour",
+"Announcement posted.": "Annonce publiée.",
+"New team code created": "Nouveau code d’équipe créé",
+"That could not be saved. Check your connection and try again.": "Cela n’a pas pu être enregistré. Vérifiez votre connexion et réessayez.",
+"You have view-only access, so this was not saved. Ask the owner for Contributor access.": "Vous avez un accès en lecture seule, donc cela n’a pas été enregistré. Demandez au propriétaire un accès de contributeur.",
+"You were signed out after 20 minutes without activity. Sign in again to continue.": "Vous avez été déconnecté après 20 minutes d’inactivité. Reconnectez-vous pour continuer.",
+"Your account was deleted.": "Votre compte a été supprimé.",
+"This account was deleted.": "Ce compte a été supprimé.",
+"That account no longer exists.": "Ce compte n’existe plus.",
+"This account has been disabled. Contact the administrator.": "Ce compte a été désactivé. Communiquez avec l’administrateur.",
+"This is an organization account. Go back and choose “I offer housing services”.": "Ceci est un compte d’organisme. Revenez en arrière et choisissez « J’offre des services de logement ».",
+"This is a personal account. Go back and choose “I need housing help”.": "Ceci est un compte personnel. Revenez en arrière et choisissez « J’ai besoin d’aide pour me loger ».",
+"This organization could not be found.": "Cet organisme est introuvable.",
+"Your profile could not be found. Sign out and create a new account.": "Votre profil est introuvable. Déconnectez-vous et créez un nouveau compte.",
+"Administrator access is for the owner of this app.": "L’accès administrateur est réservé au propriétaire de cette application.",
+"Only the owner of this app can open the administrator console.": "Seul le propriétaire de cette application peut ouvrir la console d’administration.",
+"You cannot change that account.": "Vous ne pouvez pas modifier ce compte.",
+"You cannot reset that account.": "Vous ne pouvez pas réinitialiser ce compte.",
+"The owner of your organization (under Team) or the administrator": "Le propriétaire de votre organisme (sous Équipe) ou l’administrateur",
+"Sample organizations do not have a password.": "Les organismes d’exemple n’ont pas de mot de passe.",
+"Sample organizations do not have a recovery code.": "Les organismes d’exemple n’ont pas de code de récupération.",
+"Sample organization opened": "Organisme d’exemple ouvert",
+"You are signed in as the owner.": "Vous êtes connecté en tant que propriétaire.",
+"We have a place for you tonight. Please arrive before intake closes.": "Nous avons une place pour vous ce soir. Veuillez arriver avant la fin de l’accueil.",
+"Please bring photo ID if you have it. If not, come anyway and we will help.": "Veuillez apporter une pièce d’identité avec photo si vous en avez une. Sinon, venez quand même et nous vous aiderons.",
+"We are full tonight. You are on our waitlist and we will contact you when space opens.": "Nous sommes complets ce soir. Vous êtes sur notre liste d’attente et nous vous contacterons lorsqu’une place se libérera.",
+"Please call us on the number in our listing.": "Veuillez nous appeler au numéro indiqué sur notre fiche.",
+"You are verified.": "Vous êtes vérifié.",
+"Marked verified by the administrator": "Marqué comme vérifié par l’administrateur",
+"Verified badge removed by the administrator": "Badge de vérification retiré par l’administrateur",
+"Listing suspended by the administrator": "Fiche suspendue par l’administrateur",
+"Listing restored by the administrator": "Fiche rétablie par l’administrateur",
+". May be out of date, call to confirm.": ". Peut être périmé, appelez pour confirmer.",
+"Code check (demo)": "Vérification du code (démo)",
+"In person (demo)": "En personne (démo)",
+"No code yet": "Pas encore de code",
+"Create code": "Créer un code",
+"Organization:": "Organisme :",
+"Application sent to": "Demande de logement envoyée à",
+"In person at": "En personne à",
+"Added": "Ajouté",
+"Contact Harbour Light Shelter to confirm what happens next.": "Communiquez avec Harbour Light Shelter pour confirmer la suite.",
+"I am 16 or older, or a worker is helping me.": "J’ai 16 ans ou plus, ou un intervenant m’aide.",
+"Only organizations you send a request to, and only after you agree to share with them. You can see who looked you up under Profile, and you can withdraw a request at any time.": "Seulement les organismes à qui vous envoyez une demande, et seulement après que vous avez accepté de partager avec eux. Vous pouvez voir qui vous a recherché sous Profil, et retirer une demande en tout temps."
+};
+  var FRP = [
+  [/^updated (.+?)\. Keep this current: people plan their night around it\.$/, function (m, t) { return 'mis à jour ' + t(m[1]) + '. Gardez ceci à jour : les gens planifient leur nuit en fonction de cela.'; }],
+  [/^rooms open across (\d+) shelters right now$/, 'chambres libres dans $1 refuges en ce moment'],
+  [/^Hello, (.+)$/, 'Bonjour, $1'],
+  [/^(\d+) rooms? open$/, function (m) { return m[1] + (m[1] === '1' ? ' chambre libre' : ' chambres libres'); }],
+  [/^(\d+) units? open$/, function (m) { return m[1] + (m[1] === '1' ? ' logement libre' : ' logements libres'); }],
+  [/^(\d+) of (\d+) rooms in use$/, '$1 chambres sur $2 occupées'],
+  [/^(\d+) of (\d+) units in use$/, '$1 logements sur $2 occupés'],
+  [/^(\d+) of (\d+) rooms open$/, '$1 chambres libres sur $2'],
+  [/^(\d+) of (\d+) units open$/, '$1 logements libres sur $2'],
+  [/^of (\d+) total$/, 'sur $1 au total'],
+  [/^(\d+) of (\d+) done$/, '$1 sur $2 faites'],
+  [/^wait (\d+) months?$/, function (m) { return 'attente de ' + m[1] + ' mois'; }],
+  [/^sample listing$/, 'fiche d’exemple'],
+  [/^updated (.+)$/, function (m, t) { return 'mis à jour ' + t(m[1]); }],
+  [/^counts updated (.+)$/, function (m, t) { return 'chiffres mis à jour ' + t(m[1]); }],
+  [/^just now$/, 'à l’instant'],
+  [/^(\d+) min ago$/, 'il y a $1 min'],
+  [/^(\d+) h ago$/, 'il y a $1 h'],
+  [/^(\d+) days ago$/, 'il y a $1 jours'],
+  [/^(\d+)% full · ?(.*)$/, function (m, t) { return m[1] + ' % plein'; }],
+  [/^(\d+)% full$/, '$1 % plein'],
+  [/^sent (.+)$/, 'envoyée le $1'],
+  [/^Room request$/, 'Demande de chambre'],
+  [/^Household of (\d+)$/, 'Ménage de $1 personnes'],
+  [/^score (\d+), (.+)$/, 'pointage $1, $2'],
+  [/^Standard \(score (\d+)\)$/, 'Standard (pointage $1)'],
+  [/^High \(score (\d+)\)$/, 'Élevée (pointage $1)'],
+  [/^Medium \(score (\d+)\)$/, 'Moyenne (pointage $1)'],
+  [/^Messages and history \((\d+)\)$/, 'Messages et historique ($1)'],
+  [/^Feedback \((\d+)\)$/, 'Commentaires ($1)'],
+  [/^Remove demo data \((\d+) people\)$/, 'Retirer les données de démonstration ($1 personnes)'],
+  [/^(\d+) new updates?$/, function (m) { return m[1] + (m[1] === '1' ? ' nouvelle mise à jour' : ' nouvelles mises à jour'); }],
+  [/^(\d+) requests? \((\d+) pending\)$/, function (m) { return m[1] + (m[1] === '1' ? ' demande' : ' demandes') + ' (' + m[2] + ' en attente)'; }],
+  [/^Available set to (\d+)$/, 'Disponibilité fixée à $1'],
+  [/^Total set to (\d+)$/, 'Total fixé à $1'],
+  [/^Added (.+)$/, 'Ajouté : $1'],
+  [/^(.+) updated your request: (.+)$/, function (m, t) { return m[1] + ' a mis à jour votre demande\u00a0: ' + t(m[2]); }],
+  [/^(.+): (Accepted|Declined|Waitlisted|Offer|Checked in|Withdrawn|Pending|Sent|Under review)$/, function (m, t) { return m[1] + ' : ' + t(m[2]); }],
+  [/^(.+) sent (?:you )?a message$/, '$1 a envoyé un message'],
+  [/^(.+) joined the team$/, '$1 s’est joint à l’équipe'],
+  [/^You joined (.+)\.$/, 'Vous avez joint $1.'],
+  [/^Request sent to (.+)$/, 'Demande envoyée à $1'],
+  [/^Application sent to (.+)$/, 'Demande de logement envoyée à $1'],
+  [/^This sends your profile to (.+)\. You can withdraw it any time\.$/, 'Cela envoie votre profil à $1. Vous pouvez le retirer en tout temps.'],
+  [/^About (.+):$/, 'À propos de $1 :'],
+  [/^Contact (.+) to confirm what happens next\. Address:$/, 'Communiquez avec $1 pour confirmer la suite. Adresse :'],
+  [/^Contact (.+) to confirm what happens next\.$/, 'Communiquez avec $1 pour confirmer la suite.'],
+  [/^Signed in as (.+)\.$/, 'Connecté en tant que $1.'],
+  [/^You agreed to the Privacy and terms on (.+)\.$/, 'Vous avez accepté la confidentialité et les conditions le $1.'],
+  [/^(.+) \(person\) · (.+)$/, '$1 (personne) · $2'],
+  [/^Person: (.+) · (.+)$/, 'Personne : $1 · $2'],
+  [/^Temporary password for (.+):$/, 'Mot de passe temporaire pour $1 :'],
+  [/^Please reset my password\. Contact: (.+)$/, 'Veuillez réinitialiser mon mot de passe. Coordonnées : $1'],
+  [/^We will send a 6-digit code to (.+)\.$/, 'Nous enverrons un code à 6 chiffres au $1.'],
+  [/^You have (\d+) (.+)$/, function (m) { return 'Vous avez ' + m[1] + ' ' + m[2]; }],
+  [/^(\d+) (rooms?|units?) available\. Raise the count first\.$/, 'Aucune disponibilité à retirer. Augmentez d’abord le nombre.'],
+  [/^Shelter · (.+) · sample listing$/, 'Refuge · $1 · fiche d’exemple'],
+  [/^Housing provider · (.+) · sample listing$/, 'Fournisseur de logements · $1 · fiche d’exemple'],
+  [/^Shelter · (.+)$/, 'Refuge · $1'],
+  [/^Housing provider · (.+)$/, 'Fournisseur de logements · $1'],
+  [/^Housing provider$/, 'Fournisseur de logements'],
+  [/^(.+) · (.+) · wait (\d+) months?$/, '$1 · $2 · attente de $3 mois'],
+  [/^I checked their ID, mark verified$/, 'J’ai vérifié leur pièce d’identité, marquer comme vérifié'],
+  [/^You are verified \($/, 'Vous êtes vérifié (']
+];
+
+  var FRK = {};
+  function nk(s) { return s.replace(/\s+/g, ' ').trim().replace(/[’‘]/g, "'").replace(/[“”]/g, '"'); }
+  Object.keys(FR).forEach(function (k) { FRK[nk(k)] = FR[k]; });
+  var trCache = {};
+  function trCore(s) {
+    var k = nk(s);
+    if (FRK.hasOwnProperty(k)) return FRK[k];
+    for (var i = 0; i < FRP.length; i++) {
+      var m = FRP[i][0].exec(k);
+      if (m) { var r = FRP[i][1]; return typeof r === 'function' ? r(m, tr) : k.replace(FRP[i][0], r); }
+    }
+    return null;
+  }
+  function tr(s) {
+    if (!isFr() || !s) return s;
+    var lead = s.match(/^\s*/)[0], tail = s.match(/\s*$/)[0], core = s.trim();
+    if (!core) return s;
+    if (trCache.hasOwnProperty(core)) return lead + trCache[core] + tail;
+    var out = trCore(core);
+    if (out === null && core.indexOf(' · ') > 0) {
+      var parts = core.split(' · '), ch = false;
+      parts = parts.map(function (p) { var t = trCore(p); if (t === null && p.indexOf(', ') > 0) { var q = p.split(', '), c2 = false; q = q.map(function (z) { var y = trCore(z); if (y !== null) { c2 = true; return y; } return z; }); if (c2) { t = q.join(', '); } } if (t !== null) { ch = true; return t; } return p; });
+      if (ch) out = parts.join(' · ');
+    }
+    if (out === null && core.indexOf(', ') > 0) {
+      var q2 = core.split(', '), c3 = false;
+      q2 = q2.map(function (z) { var y = trCore(z); if (y !== null) { c3 = true; return y; } return z; });
+      if (c3) out = q2.join(', ');
+    }
+    if (out === null) out = core;
+    trCache[core] = out;
+    return lead + out + tail;
+  }
+  function trDom(root) {
+    if (!isFr() || !root) return;
+    var tw = document.createTreeWalker(root, 4, null), n, list = [];
+    while ((n = tw.nextNode())) list.push(n);
+    list.forEach(function (n) {
+      var p = n.parentNode && n.parentNode.nodeName;
+      if (p === 'SCRIPT' || p === 'STYLE' || p === 'TEXTAREA') return;
+      var v = n.nodeValue; if (!v || !/[A-Za-z]/.test(v)) return;
+      var t = tr(v); if (t !== v) n.nodeValue = t;
+    });
+    [].forEach.call(root.querySelectorAll('[placeholder],[aria-label],[title],[alt]'), function (e) {
+      ['placeholder', 'aria-label', 'title', 'alt'].forEach(function (a) { var v = e.getAttribute(a); if (v) { var t = tr(v); if (t !== v) e.setAttribute(a, t); } });
+    });
+  }
+  function applyLang() { document.documentElement.setAttribute('lang', isFr() ? 'fr' : 'en'); }
+  var R = { screen: 'welcome', auth: 'up', tab: 'home', sub: '', find: 'shelter', fG: 'All', fQ: '', open: null, draft: {}, errs: '', code: '', otab: 'overview', ofilter: 'Pending', atab: 'orgs', lookup: null, lookedUp: false, declining: null, confirmDel: false, asRole: null };
+  function dv(k, fb) { return R.draft[k] !== undefined ? R.draft[k] : fb; }
+  var uploadTarget = null;
+  var ICON = {
+    home: '<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    find: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+    req: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+    vault: '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+    profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/>'
+  };
+  var TABS = [['home', 'Home'], ['find', 'Find'], ['req', 'Requests'], ['vault', 'Vault'], ['help', 'Help'], ['profile', 'Profile']];
+  var TICK = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>';
+  function toast(m) { var b = $('#toastbox'); b.innerHTML = '<div class="toast" role="status">' + esc(tr(m)) + '</div>'; clearTimeout(toast.t); toast.t = setTimeout(function () { b.innerHTML = ''; }, 3400); }
+
+  /* ---------- selectors ---------- */
+  function vals(coll) { return Object.keys(mem[coll]).map(function (k) { return mem[coll][k]; }); }
+  function account() { return ses && mem.accounts[ses.accId] ? mem.accounts[ses.accId] : null; }
+  function role() { if (!ses) return null; if (ses.admin) return 'admin'; if (ses.demo) return 'org'; return account() ? account().role : null; }
+  function me() { return account() ? account().id : null; }
+  function mine() { return me() ? mem.people[me()] : null; }
+  function orgById(id) { return mem.orgs[id] || byId(SAMPLE, id) || null; }
+  function myOrg() { return ses && ses.orgId ? orgById(ses.orgId) : null; }
+  function allOrgs() {
+    var o = {}; SAMPLE.forEach(function (s) { o[s.id] = s; });
+    vals('orgs').forEach(function (x) { o[x.id] = x; });
+    return Object.keys(o).map(function (k) { return o[k]; });
+  }
+  function listed() { return allOrgs().filter(function (o) { return o.status !== 'Suspended'; }); }
+  function orgName(id) { var o = orgById(id); return o ? o.name : 'An organization'; }
+  function myRequests() { return vals('requests').filter(function (r) { return r.uid === me(); }); }
+  function orgRequests(id) { return vals('requests').filter(function (r) { return r.orgId === id; }); }
+  function unit(o) { return o.kind === 'shelter' ? 'room' : 'unit'; }
+  function levelPill(l) { return '<span class="pill ' + (l === 'High' ? 'crit' : l === 'Medium' ? 'warn' : 'idle') + '">' + esc(l || 'Not assessed') + (l ? ' priority' : '') + '</span>'; }
+  function statusPill(s) { var c = (s === 'Accepted' || s === 'Offer' || s === 'Checked in') ? 'ok' : s === 'Declined' || s === 'Withdrawn' ? 'crit' : s === 'Waitlisted' ? 'warn' : ''; return '<span class="pill ' + c + '">' + esc(s) + '</span>'; }
+  function consumes(o, st) { return o.kind === 'shelter' ? (st === 'Accepted' || st === 'Checked in') : st === 'Offer'; }
+  function first() { var p = mine(); return p && p.name ? p.name.split(' ')[0] : 'there'; }
+  function orgEdit(id, fn) { var o = clone(orgById(id)); fn(o); put('orgs', id, o); return o; }
+  function orgLog(id, m) { orgEdit(id, function (o) { o.log = (o.log || []).concat([{ m: m, t: now() }]).slice(-40); }); }
+  function personLog(uid, m) { var p = mem.people[uid]; if (!p) return; p = clone(p); p.log = (p.log || []).concat([{ m: m, t: now() }]).slice(-40); put('people', uid, p); }
+
+  /* ---------- chrome ---------- */
+  function top() {
+    var a = account(), r = role(), who = '';
+    if (r === 'admin') who = 'Administrator';
+    else if (r === 'org' && myOrg()) who = myOrg().name;
+    else if (a) who = a.name;
+    var pill = shared ? '<span class="pill ok">Shared test</span>' : '<span class="pill idle">This device only</span>';
+    $('#top').innerHTML = '<div class="brand"><div class="logo"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div><b>HomeConnect Canada</b></div>' +
+      '<div class="modebar">' + (STANDALONE ? '' : pill) + '<button class="btn ghost sm" data-act="togglelang" lang="' + (isFr() ? 'en' : 'fr') + '" aria-label="' + (isFr() ? 'Switch to English' : 'Passer au français') + '">' + (isFr() ? 'EN' : 'FR') + '</button><button class="btn ghost sm" data-act="lg" aria-pressed="' + !!ui.lg + '" aria-label="Larger text">Aa</button>' + (r ? '<span class="small muted">' + esc(who) + '</span><button class="btn ghost sm" data-act="signout">Sign out</button>' : (R.screen !== 'welcome' ? '<button class="btn ghost sm" data-act="home">← Start over</button>' : '')) + '</div>';
+  }
+  function tabbar() {
+    var on = role() === 'person' && mine() && !R.showCode;
+    document.body.classList.toggle('tabs', !!on);
+    if (!on) { $('#tabs').innerHTML = ''; return; }
+    $('#tabs').innerHTML = '<nav class="tabbar" aria-label="Main"><div>' + TABS.map(function (t) {
+      var sel = R.tab === t[0] && !R.sub;
+      return '<button data-act="tab" data-v="' + t[0] + '" class="' + (sel ? 'on' : '') + '"' + (sel ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24">' + ICON[t[0]] + '</svg>' + t[1] + (t[0] === 'req' && unread() ? '<span class="badge" aria-label="' + unread() + ' new updates">' + unread() + '</span>' : '') + '</button>';
+    }).join('') + '</div></nav>';
+  }
+  function modeNote() {
+    if (STANDALONE) return '<div class="banner warn">Demo with made-up information only. Accounts and data stay on this device and are not shared. Shelters and providers are fictional.</div>';
+    if (shared) return '<div class="banner">Shared test: everyone with the link sees the same shelters, requests and rooms. <b>Use made-up names and phone numbers only.</b> Sign-in here is a demo and is not secure.</div>';
+    return '<div class="banner warn">Working on this device only. To test with friends, open the shared link while signed in to Claude. Everything here is fictional demo data.</div>';
+  }
+  function err() { return R.errs ? '<p class="err" role="alert">' + esc(R.errs) + '</p>' : ''; }
+  function fld(id, label, type, key, ph, ac) {
+    return '<div class="field"><label for="' + id + '">' + label + '</label><input class="input" id="' + id + '" type="' + (type || 'text') + '" data-d="' + key + '" autocomplete="' + (ac || 'off') + '" placeholder="' + esc(ph || '') + '" value="' + esc(dv(key, '')) + '"></div>';
+  }
+  function chips(key, options, selected, fb) {
+    var sel = dv(key, fb);
+    return '<div class="seg">' + options.map(function (o) { return '<button type="button" class="chip ' + (sel.indexOf(o) >= 0 ? 'on' : '') + '" data-act="tg" data-k="' + key + '" data-v="' + esc(o) + '" aria-pressed="' + (sel.indexOf(o) >= 0) + '">' + esc(o) + '</button>'; }).join('') + '</div>';
+  }
+
+  /* ---------- welcome and auth ---------- */
+  function crisis() {
+    return '<div class="crisis" role="region" aria-label="Help right now"><h3>Need help right now?</h3><div class="stack small">' +
+      '<div><b class="mono">911</b> Emergency: danger or a medical emergency</div>' +
+      '<div><b class="mono">988</b> Suicide Crisis Helpline, call or text, any time</div>' +
+      '<div><b class="mono">211</b> Dial 211 to find shelter, food and services in Nova Scotia</div>' +
+      '<div><b class="mono">1-888-429-8167</b> Nova Scotia Mental Health and Addictions Crisis Line</div>' +
+      '<div><b class="mono">1-800-668-6868</b> Kids Help Phone, for young people</div></div></div>';
+  }
+  function langChooser() {
+    return '<div class="hero"><h1>Choose your language<br>Choisissez votre langue</h1><p>Which language would you like service in? You can change it any time with the EN / FR button at the top.<br>Dans quelle langue souhaitez-vous recevoir le service? Vous pouvez la changer en tout temps avec le bouton EN / FR en haut.</p></div>' +
+      '<button class="choice" lang="en" data-act="setlang" data-v="en"><span class="label">English</span><h2>Continue in English</h2></button>' +
+      '<button class="choice" lang="fr" data-act="setlang" data-v="fr"><span class="label">Français</span><h2>Continuer en français</h2></button>' +
+      '<div class="crisis" role="region" aria-label="Help right now / Aide immédiate"><h3>911 · 988 · 211</h3><p class="small">Emergency / Urgence: 911 · Crisis / Crise: 988 · Services: 211</p></div>';
+  }
+  function welcome() {
+    var steps = STANDALONE
+      ? ['Choose “I need housing help” and create an account with a made-up name and number.', 'Sign out, then choose “I offer housing services” and register a shelter, or open the sample organization.', 'Sign back in as the person and send a request. Then sign in as the organization and accept or decline it.', 'Open Help and send feedback. Use the Administrator link to see everything.']
+      : ['Choose “I need housing help” and create an account with a made-up name and number.', 'On a second phone or browser window, choose “I offer housing services” and register a shelter, or open the sample organization.', 'Send a request from the person account. Accept or decline it from the organization, and send a message.', 'Open Help and send feedback about anything that confused you.'];
+    return modeNote() +
+      '<div class="hero"><h1>A safe place to start.</h1><p>HomeConnect connects people who need housing with the shelters and housing providers who can help.</p></div>' +
+      crisis() +
+      '<button class="choice" data-act="pick" data-v="person"><span class="label">For people</span><h2>I need housing help</h2><p class="muted">Create an account or sign in to ask for a bed, apply for housing and keep your documents in one place.</p><span class="go">Continue →</span></button>' +
+      '<button class="choice" data-act="pick" data-v="org"><span class="label">For organizations</span><h2>I offer housing services</h2><p class="muted">Shelters and housing providers update rooms, review requests and talk with the people who apply.</p><span class="go">Continue →</span></button>' +
+      '<button class="choice" data-act="pick" data-v="guest"><span class="label">No account needed</span><h2>Show me open beds tonight</h2><p class="muted">See which shelters have space right now and how to reach them.</p><span class="go">Look now →</span></button>' +
+      '<details class="card"><summary>How to test this app with friends</summary><ol class="tlist" style="padding-left:18px;margin-top:10px">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol><p class="small muted">Use made-up names and numbers. Shelters and providers listed are fictional.</p></details>' +
+      '<p class="small muted" style="text-align:center"><button class="link small" data-act="showprivacy">Privacy and terms</button> · ' + ((STANDALONE || !shared || isOwner) ? '<button class="link small" data-act="pick" data-v="admin">Administrator</button>' : 'Administrator access is for the owner of this app.') + '</p>';
+  }
+  function authTabs(joinable) {
+    return '<div class="stabs" role="tablist"><button role="tab" class="' + (R.auth === 'up' ? 'on' : '') + '" data-act="authmode" data-v="up">Create account</button>' + (joinable ? '<button role="tab" class="' + (R.auth === 'join' ? 'on' : '') + '" data-act="authmode" data-v="join">Join your team</button>' : '') + '<button role="tab" class="' + (R.auth === 'in' ? 'on' : '') + '" data-act="authmode" data-v="in">Sign in</button></div>';
+  }
+  function signInForm(kind) {
+    return '<div class="card"><h2>Sign in</h2>' + fld('si-id', 'Phone number or email', 'text', 'si_id', 'you@example.com or 902-555-0100', 'username') +
+      fld('si-pw', 'Password', 'password', 'si_pw', '', 'current-password') + err() +
+      '<button class="btn" data-act="signin" data-kind="' + kind + '">Sign in</button><button class="link" data-act="forgot" style="align-self:flex-start">Forgot password?</button>' +
+      (kind === 'org' ? '<hr><div class="stack"><p class="small muted">Want to look around first?</p><button class="btn ghost" data-act="demoorg">Try a sample organization</button></div>' : '') + '</div>';
+  }
+  function codeScreen() {
+    return '<div class="card"><span class="label">One last step</span><h2>Save your recovery code</h2><p class="muted">If you forget your password, this code lets you reset it yourself. It cannot be shown again. Write it down or take a screenshot, and keep it somewhere safe.</p>' +
+      '<div class="demo" style="font-size:20px;text-align:center;letter-spacing:.08em">' + esc(R.showCode) + '</div>' +
+      '<div class="row"><button class="btn ghost" data-act="copycode">Copy code</button><button class="btn" data-act="codesaved">I saved it, continue</button></div></div>';
+  }
+  function forgotForm() {
+    var org = R.screen === 'org';
+    return '<div class="card"><h2>Reset your password</h2><p class="small muted">Enter the phone number or email you signed up with, the recovery code you saved when you made your account, and a new password.</p>' +
+      fld('fg-id', 'Phone number or email', 'text', 'fg_id', 'you@example.com or 902-555-0100', 'username') + fld('fg-code', 'Recovery code', 'text', 'fg_code', 'XXXX-XXXX-XXXX') + fld('fg-pw', 'New password (8 or more characters)', 'password', 'fg_pw', '', 'new-password') + err() +
+      '<button class="btn" data-act="recover">Reset password</button><hr><h3>I do not have my code</h3><p class="small muted">Ask for help instead. ' + (org ? 'The owner of your organization (under Team) or the administrator' : 'The administrator') + ' can give you a temporary password.</p>' +
+      (R.fgMsg ? '<div class="banner" role="status">' + esc(R.fgMsg) + '</div>' : '') +
+      '<div class="row"><button class="btn ghost" data-act="resetrequest">Ask for a reset</button><button class="link" data-act="authmode" data-v="in">Back to sign in</button></div></div>';
+  }
+  function personAuth() {
+    if (!R.signupOk && R.auth === 'up') {}
+    var body;
+    if (R.auth === 'forgot') body = forgotForm();
+    else if (R.auth === 'in') body = signInForm('person');
+    else body = '<div class="card"><h2>Create your account</h2><p class="small muted">Use a phone number, an email, or both. You will use either one to sign in.</p>' +
+      fld('d-name', 'Name', 'text', 'name', 'Use a made-up name to test', 'off') +
+      fld('d-phone', 'Mobile number', 'tel', 'phone', '902-555-0100', 'tel') +
+      fld('d-email', 'Email (optional if you gave a number)', 'email', 'email', 'you@example.com', 'email') +
+      fld('d-pw', 'Password (8 or more characters)', 'password', 'pw', '', 'new-password') +
+      '<div class="field"><label for="d-sit">Where are you staying right now?</label><select class="input" id="d-sit" data-d="status"><option value="">Choose one</option>' + SITUATIONS.map(function (s) { return '<option' + (dv('status', '') === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="d-lang">Language you prefer to be helped in</label><select class="input" id="d-lang" data-d="lang">' + ['English', 'Français', 'العربية', 'Español', 'Mi’kmaq'].map(function (s) { return '<option' + (dv('lang', isFr() ? 'Français' : 'English') === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></div>' +
+      agreeLine('agree', 'I am 16 or older, or a worker is helping me.') + err() +
+      '<button class="btn" data-act="signup-person">Create account</button></div>';
+    return modeNote() + '<h1>Housing help</h1>' + authTabs() + body;
+  }
+  function orgAuth() {
+    var body, login = fld('o-phone', 'Phone number', 'tel', 'phone', '902-555-0100', 'tel') +
+      fld('o-email', 'Email (optional if you gave a number)', 'email', 'email', 'office@example.org', 'email') +
+      fld('o-pw', 'Password (8 or more characters)', 'password', 'pw', '', 'new-password');
+    if (R.auth === 'forgot') body = forgotForm();
+    else if (R.auth === 'in') body = signInForm('org');
+    else if (R.auth === 'join') body = '<div class="card"><h2>Join your team</h2><p class="small muted">Ask the person who registered your organization for the team code. You will find it under Team.</p>' +
+      fld('j-code', 'Team code', 'text', 'jcode', 'e.g. K7P2QX') + fld('j-name', 'Your name', 'text', 'cname', '', 'name') + login + agreeLine('oagree', 'I am allowed to act for this organization.') + err() + '<button class="btn" data-act="signup-staff">Join team</button></div>';
+    else body = '<div class="card"><h2>Register your organization</h2><p class="small muted">This creates your organization page and the login you will use to manage it. You can add colleagues later.</p>' +
+      fld('o-name', 'Organization name', 'text', 'oname', 'e.g. Harbour Light Shelter', 'organization') +
+      '<div class="field"><label for="o-kind">What do you offer?</label><select class="input" id="o-kind" data-d="okind"><option value="shelter"' + (dv('okind', 'shelter') === 'shelter' ? ' selected' : '') + '>Shelter (beds or rooms)</option><option value="housing"' + (dv('okind', 'shelter') === 'housing' ? ' selected' : '') + '>Housing provider (units)</option></select></div>' +
+      fld('o-area', 'Area or neighbourhood', 'text', 'oarea', 'e.g. Dartmouth') +
+      '<div class="grid2">' + fld('o-total', 'Total rooms or units', 'number', 'ototal', '20') + fld('o-avail', 'Available right now', 'number', 'oavail', '5') + '</div>' +
+      '<div class="field"><label>Who do you serve?</label>' + chips('ogroups', GROUPS, null, ['Adults']) + '</div>' +
+      '<div class="field"><label>Services</label>' + chips('oservices', SERVICES, null, []) + '</div>' +
+      '<hr><p class="small muted">Your login</p>' + fld('o-contact', 'Your name', 'text', 'cname', '', 'name') + login + agreeLine('oagree', 'I am allowed to act for this organization.') + err() +
+      '<button class="btn" data-act="signup-org">Register organization</button></div>';
+    return modeNote() + '<h1>Organizations</h1>' + authTabs(true) + body;
+  }
+  function adminAuth() {
+    return modeNote() + '<h1>Administrator</h1>' +
+      (shared && !isOwner ? '<div class="card"><p>Only the owner of this app can open the administrator console.</p></div>' :
+        '<div class="card"><p class="muted small">Administrators see every account, organization and request, and can verify or suspend organizations.' + (shared ? ' You are signed in as the owner.' : ' In this test there is no password, so anyone using this device can open it.') + '</p><button class="btn" data-act="enteradmin">Open administrator console</button></div>');
+  }
+
+  /* ---------- person screens ---------- */
+  function nextSteps(p) {
+    var reqs = myRequests();
+    return [
+      [p.verified, 'Verify who you are', 'A code, or in person with a worker.', 'verify', 'Verify'],
+      [!!p.assessment, 'Answer 5 short questions', 'Helps providers understand your situation.', 'assess', 'Start'],
+      [p.docs[0].status !== 'Missing', 'Add your photo ID to the vault', 'Keeps it ready for requests.', 'goto:vault', 'Open vault'],
+      [reqs.some(function (r) { return orgById(r.orgId) && orgById(r.orgId).kind === 'shelter'; }), 'Ask a shelter for a room', 'See what is open tonight.', 'goto:find', 'Find a room'],
+      [reqs.some(function (r) { return orgById(r.orgId) && orgById(r.orgId).kind === 'housing'; }), 'Apply for housing', 'Apply once, follow progress here.', 'goto:findh', 'Browse']
+    ];
+  }
+  function home() {
+    var p = mine(), open = 0, count = 0;
+    listed().forEach(function (o) { if (o.kind === 'shelter' && o.accepting !== false && o.available > 0) { open += o.available; count++; } });
+    var steps = nextSteps(p), doneN = steps.filter(function (s) { return s[0]; }).length;
+    var feed = [];
+    myRequests().forEach(function (r) {
+      (r.events || []).forEach(function (e) { feed.push({ t: e.t, m: orgName(r.orgId) + ': ' + e.l + (e.note ? ' (' + e.note + ')' : '') }); });
+      (r.messages || []).filter(function (m) { return m.from === 'org'; }).forEach(function (m) { feed.push({ t: m.t, m: orgName(r.orgId) + ' sent a message' }); });
+    });
+    feed.sort(function (a, b) { return a.t < b.t ? 1 : -1; });
+    return modeNote() +
+      '<div class="hero"><p class="small" style="opacity:.8">Hello, ' + esc(first()) + '</p><div class="big">' + open + '</div><p>rooms open across ' + count + ' shelters right now</p><div class="row"><button class="btn" data-act="goto:find">Find a room</button>' + (p.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill warn">Not verified yet</span>') + '</div></div>' +
+      '<div class="card"><div class="row between"><h2>Next steps</h2><span class="small muted">' + doneN + ' of ' + steps.length + ' done</span></div><div class="meter"><b style="width:' + (doneN / steps.length * 100) + '%"></b></div><div>' +
+      steps.map(function (s) { return '<div class="check"><div class="tick ' + (s[0] ? 'done' : '') + '">' + TICK + '</div><div class="grow"><b>' + s[1] + '</b><div class="small muted">' + s[2] + '</div></div>' + (s[0] ? '' : '<button class="btn ghost sm" data-act="' + s[3] + '">' + s[4] + '</button>') + '</div>'; }).join('') + '</div></div>' +
+      crisis() + '<div class="card"><h2>Updates</h2>' + (feed.length ? '<div class="stack">' + feed.slice(0, 6).map(function (f) { return '<div><div>' + esc(f.m) + '</div><div class="small muted">' + fmt(f.t) + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nothing yet. When an organization responds, you will see it here.</p>') + '</div>';
+  }
+  function verifyView() {
+    var p = mine(), body, via = p.phone ? showPhone(p.phone) : p.email;
+    if (p.verified) body = '<p>You are verified (' + esc(p.vmethod) + ').</p>';
+    else if (!R.code) body = '<p>We will send a 6-digit code to ' + esc(via) + '.</p><button class="btn" data-act="sendcode">Send me a code</button><hr><p class="small muted">No phone? Visit a shelter and ask a worker to verify you in person.</p>';
+    else body = '<div class="demo">Demo mode: no real message is sent. Your code is <b>' + esc(R.code) + '</b></div>' +
+      '<div class="field"><label for="code">Enter the code</label><input class="input mono" id="code" inputmode="numeric" maxlength="6" data-d="codeIn" autocomplete="one-time-code"></div>' + err() + '<button class="btn" data-act="checkcode">Confirm</button>';
+    return '<button class="btn ghost sm" data-act="back" style="align-self:flex-start">← Back</button><div class="card"><h2>Verify your identity</h2>' + body + '</div>';
+  }
+  function assessView() {
+    var p = mine(), a = (p.assessment && p.assessment.answers) || {}, d = R.draft.ans || a;
+    return '<button class="btn ghost sm" data-act="back" style="align-self:flex-start">← Back</button><div class="card"><h2>A few questions</h2><p class="muted small">Answers go only to organizations you send a request to.</p>' +
+      QUESTIONS.map(function (q) { return '<div class="q"><b>' + q.t + '</b><div class="seg">' + q.o.map(function (o) { return '<button class="chip ' + (d[q.k] != null && String(d[q.k]) === String(o[1]) ? 'on' : '') + '" data-act="ans" data-q="' + q.k + '" data-v="' + o[1] + '">' + o[0] + '</button>'; }).join('') + '</div></div>'; }).join('') +
+      '<button class="btn" data-act="saveassess"' + (QUESTIONS.every(function (q) { return d[q.k] != null; }) ? '' : ' disabled') + '>Save answers</button></div>';
+  }
+  function ago(t) { if (!t) return ''; var m = Math.round((Date.now() - new Date(t).getTime()) / 60000); if (m < 1) return 'just now'; if (m < 60) return m + ' min ago'; var h = Math.round(m / 60); if (h < 24) return h + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+  function reqForm(o) {
+    var cb = function (k, label) { return '<label class="row small"><input type="checkbox" data-dc="' + k + '" ' + (dv(k, false) ? 'checked' : '') + '> ' + label + '</label>'; };
+    return '<div class="card inner"><h3>' + (o.kind === 'housing' ? 'Send your application' : 'Send your request') + '</h3>' +
+      '<div class="field"><label for="rq-hh">How many people?</label><input class="input" id="rq-hh" type="number" min="1" max="12" data-d="rq_hh" value="' + esc(dv('rq_hh', 1)) + '"></div>' +
+      (o.kind === 'shelter' ? cb('rq_urgent', 'I need a place tonight') : '') + cb('rq_pets', 'I have a pet') + cb('rq_access', 'I need an accessible room or unit') +
+      '<label class="row small"><input type="checkbox" data-dc="rq_consent" ' + (dv('rq_consent', false) ? 'checked' : '') + '> <span>I agree to share my name, contact details, situation, answers and document list with <b>' + esc(o.name) + '</b> for this request.</span></label>' +
+      '<div class="field"><label for="rq-note">Anything they should know? (optional)</label><textarea class="input" id="rq-note" maxlength="300" data-d="rq_note">' + esc(dv('rq_note', '')) + '</textarea></div>' +
+      '<div class="row"><button class="btn" data-act="sendrequest" data-v="' + o.id + '">Send</button><button class="btn ghost" data-act="cancelreq">Cancel</button></div>' +
+      '<p class="small muted">This sends your profile to ' + esc(o.name) + '. You can withdraw it any time.</p></div>';
+  }
+  function find(guest) {
+    var reqs = {}; if (!guest) myRequests().forEach(function (r) { reqs[r.orgId] = r; });
+    var q = R.fQ.toLowerCase(), kind = R.find;
+    var list = listed().filter(function (o) { return o.kind === kind && (R.fG === 'All' || (o.groups || []).indexOf(R.fG) >= 0) && (!q || (o.name + ' ' + (o.area || '')).toLowerCase().indexOf(q) >= 0); })
+      .sort(function (a, b) { return (b.available > 0 && b.accepting !== false) - (a.available > 0 && a.accepting !== false) || b.available - a.available; });
+    return (guest ? '' : '<h1>Find help</h1>') + '<div class="seg"><button class="chip ' + (kind === 'shelter' ? 'on' : '') + '" data-act="findkind" data-v="shelter">Shelters</button><button class="chip ' + (kind === 'housing' ? 'on' : '') + '" data-act="findkind" data-v="housing">Housing providers</button></div>' +
+      '<div class="field"><label class="small muted" for="fq">Search by name or area</label><input class="input" id="fq" data-d="fq" value="' + esc(R.fQ) + '" placeholder="Search"></div>' +
+      '<div class="seg">' + ['All'].concat(GROUPS).map(function (g) { return '<button class="chip ' + (R.fG === g ? 'on' : '') + '" data-act="fg" data-v="' + esc(g) + '">' + esc(g) + '</button>'; }).join('') + '</div>' +
+      (list.length ? list.map(function (o) {
+        var b = o.available, r = reqs[o.id], open = R.open === o.id || guest, closed = o.accepting === false;
+        var stale = o.availT && Date.now() - new Date(o.availT).getTime() > 864e5;
+        return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(o.name) + (o.verified ? ' <span class="pill ok">Verified</span>' : '') + '</h3><div class="small muted">' + esc(o.area || '') + ' · ' + esc((o.groups || []).join(', ')) + (o.kind === 'housing' && o.wait ? ' · wait ' + esc(o.wait) : '') + '</div></div>' +
+          '<span class="pill ' + (closed ? 'idle' : b === 0 ? 'crit' : b < 4 ? 'warn' : 'ok') + '">' + (closed ? 'Not accepting' : b === 0 ? 'Full' : b + ' ' + unit(o) + (b > 1 ? 's' : '') + ' open') + '</span></div>' +
+          (o.announcement ? '<div class="banner">' + esc(o.announcement) + '</div>' : '') +
+          '<div class="meter" aria-hidden="true"><b style="width:' + (o.total ? Math.round((o.total - b) / o.total * 100) : 0) + '%"></b></div>' +
+          '<div class="small ' + (stale ? '' : 'muted') + '">' + (o.total - b) + ' of ' + o.total + ' ' + unit(o) + 's in use · ' + (o.availT ? 'updated ' + ago(o.availT) + (stale ? '. May be out of date, call to confirm.' : '') : 'sample listing') + '</div>' +
+          (guest ? '<div>Call <b class="mono">' + esc(o.phone || 'not listed') + '</b></div>' : '') +
+          '<div class="row">' + (guest ? '' : '<button class="btn ghost sm" data-act="open" data-v="' + o.id + '">' + (open ? 'Hide details' : 'Details') + '</button>') + (guest ? '' : '<button class="link small" data-act="report" data-v="' + o.id + '">Report a problem</button>') +
+          (guest ? '<button class="btn sm" data-act="pick" data-v="person">Sign up to send a request</button>' : (r ? statusPill(r.status) : (closed ? '' : '<button class="btn sm" data-act="request" data-v="' + o.id + '">' + (o.kind === 'housing' ? 'Apply' : (b ? 'Ask for a room' : 'Join waitlist')) + '</button>'))) + '</div>' +
+          (R.reqFor === o.id && !guest ? reqForm(o) : '') +
+          (open ? '<dl class="kv"><dt>Hours</dt><dd>' + esc(o.hours || 'Not listed') + '</dd><dt>Phone</dt><dd>' + esc(o.phone || 'Not listed') + '</dd>' + (o.email ? '<dt>Email</dt><dd>' + esc(o.email) + '</dd>' : '') + (o.address ? '<dt>Address</dt><dd>' + (o.addrPrivate ? 'Shared with you once your request is accepted' : esc(o.address)) + '</dd>' : '') + '<dt>Services</dt><dd>' + esc((o.services || []).join(', ') || 'Not listed') + '</dd>' + (o.desc ? '<dt>About</dt><dd>' + esc(o.desc) + '</dd>' : '') + '<dt>Good to know</dt><dd>' + esc(o.rules || '') + '</dd></dl>' : '') + '</div>';
+      }).join('') : '<div class="card"><p class="muted">Nothing matches. Try another group or clear the search.</p></div>');
+  }
+  function guestView() {
+    return '<div><span class="label">No account needed</span><h1>Open beds tonight</h1></div><p class="muted">Call a shelter to confirm before you go. Create an account to send a request and keep your documents in one place.</p>' + crisis() + find(true) +
+      '<div class="card"><p class="small muted">Counts are set by each shelter and can change quickly.</p><button class="btn" data-act="pick" data-v="person" style="align-self:flex-start">Create an account</button></div>';
+  }
+  function thread(r, side) {
+    var msgs = r.messages || [], k = 'msg_' + r.id;
+    return '<div class="msgs">' + (msgs.length ? msgs.map(function (m) { return '<div class="msg ' + (m.from === side ? 'me' : '') + '">' + esc(m.text) + '<div class="small muted">' + fmt(m.t) + '</div></div>'; }).join('') : '<p class="small muted">No messages yet.</p>') + '</div>' +
+      '<div class="row"><input class="input grow" id="' + k + '" data-d="' + k + '" placeholder="Write a message" value="' + esc(dv(k, '')) + '" aria-label="Message"><button class="btn sm" data-act="sendmsg" data-id="' + r.id + '" data-side="' + side + '">Send</button></div>';
+  }
+  function reqTags(r) {
+    var t = []; if (r.urgent) t.push('<span class="pill crit">Needs a place tonight</span>'); if (r.hh > 1) t.push('<span class="pill idle">Household of ' + r.hh + '</span>');
+    if (r.pets) t.push('<span class="pill idle">Has a pet</span>'); if (r.access) t.push('<span class="pill idle">Needs accessible</span>');
+    return (t.length ? '<div class="row">' + t.join('') + '</div>' : '') + (r.note ? '<div class="banner">“' + esc(r.note) + '”</div>' : '');
+  }
+  function isNew(r) {
+    var s = R.prevSeen; if (!s) return false;
+    return (r.events || []).some(function (e) { return e.l !== 'Sent' && e.t > s; }) || (r.messages || []).some(function (m) { return m.from === 'org' && m.t > s; });
+  }
+  function requests() {
+    var list = myRequests().sort(function (a, b) { return a.updated < b.updated ? 1 : -1; });
+    return '<h1>My requests</h1>' + (list.length ? list.map(function (r) {
+      var o = orgById(r.orgId) || { name: 'Organization', kind: 'shelter', phone: '' }, open = R.open === r.id;
+      return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(o.name) + (isNew(r) ? ' <span class="pill crit">New</span>' : '') + '</h3><div class="small muted">' + (o.kind === 'housing' ? 'Housing application' : 'Room request') + ' · sent ' + fmt(r.t) + '</div></div>' + statusPill(r.status) + '</div>' +
+        (r.status === 'Accepted' || r.status === 'Offer' || r.status === 'Checked in' ? '<div class="banner"><b>Good news.</b> Contact ' + esc(o.name) + (o.phone ? ' on <span class="mono">' + esc(o.phone) + '</span>' : '') + ' to confirm what happens next.' + (o.address ? ' Address: <b>' + esc(o.address) + '</b>.' : '') + '</div>' : '') +
+        (r.status === 'Declined' ? '<div class="banner">' + (r.reason ? 'Reason given: ' + esc(r.reason) + '. ' : '') + 'You can ask another shelter or provider under Find.</div>' : '') +
+        reqTags(r) +
+        '<div class="row"><button class="btn ghost sm" data-act="open" data-v="' + r.id + '">' + (open ? 'Hide' : 'Messages and history') + ((r.messages || []).length ? ' (' + r.messages.length + ')' : '') + '</button>' +
+        (['Declined', 'Withdrawn'].indexOf(r.status) < 0 ? '<button class="btn danger sm" data-act="withdraw" data-v="' + r.id + '">Withdraw and stop sharing</button>' : '') + '</div>' +
+        (open ? '<ul class="tlist">' + (r.events || []).map(function (e) { return '<li><b>' + esc(e.l) + '</b> <span class="muted">' + fmt(e.t) + '</span></li>'; }).join('') + '</ul>' + thread(r, 'person') : '') + '</div>';
+    }).join('') : '<div class="card"><p class="muted">No requests yet. Go to Find to ask a shelter for a room or apply for housing.</p><button class="btn" data-act="goto:find" style="align-self:flex-start">Find help</button></div>');
+  }
+  function vault() {
+    var p = mine();
+    return '<h1>Document vault</h1><div class="banner">In this test only the <b>file name</b> is kept. The file stays on your device.</div>' +
+      p.docs.map(function (d, i) {
+        return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(d.type) + '</h3><div class="small muted">' + (d.name ? esc(d.name) : 'Nothing added') + '</div></div><span class="pill ' + (d.status === 'Verified' ? 'ok' : d.status === 'Pending' ? 'warn' : 'idle') + '">' + esc(d.status) + '</span></div>' +
+          '<div class="row"><button class="btn ' + (d.name ? 'ghost' : '') + ' sm" data-act="upload" data-v="' + i + '">' + (d.name ? 'Replace' : 'Add file') + '</button>' + (d.name ? '<button class="btn danger sm" data-act="rmdoc" data-v="' + i + '">Remove</button>' : '') + '</div></div>';
+      }).join('');
+  }
+  function privacyView() {
+    var sec = function (h, body) { return '<div class="card"><h3>' + h + '</h3>' + body + '</div>'; };
+    var ul = function (a) { return '<ul class="tlist" style="padding-left:18px">' + a.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'; };
+    return '<button class="btn ghost sm" data-act="closeprivacy" style="align-self:flex-start">← Back</button><h1>Privacy and terms</h1>' +
+      '<div class="banner warn"><b>Test version.</b> This notice is a plain-language draft. Before real clients use the app, a lawyer and your privacy officer should review and finish it.</div>' +
+      sec('What this app is', '<p class="small">HomeConnect helps people find a shelter bed or housing and lets organizations respond. In this test, everything is made up. Please do not enter real names, numbers or documents.</p>') +
+      sec('What we keep', ul(['Your name, phone number and/or email, where you are staying, and the language you prefer.', 'Your answers to five short questions and the names of documents you list (not the files).', 'Your requests and messages. For organizations: your listing, rooms available, and your staff’s names and contact details.'])) +
+      sec('Why we keep it', '<p class="small">To show you shelters and housing, to let an organization answer your request, and to keep the service safe. We do not sell your information and we do not use it for advertising.</p>') +
+      sec('Who can see it', ul(['An organization sees your name, contact details, situation, answers and document list only after you send it a request and agree to share with it. If you withdraw the request, they lose access to those details.', 'An organization that looks you up to verify you in person sees only whether you are verified.', 'Administrators can see everything, for support and safety.'])) +
+      sec('Your choices', ul(['Withdraw a request any time under Requests to stop sharing with that organization.', 'Edit your details, download a copy of your information, or delete your account under Profile.', 'Ask for help with anything else through Help, then Send feedback.'])) +
+      sec('How long we keep it', '<p class="small">In this test, until you delete your account or test data is cleared. Before launch, a clear retention period will be set and shown here.</p>') +
+      sec('Where it is stored', '<p class="small">In this test, either on your own device or in the shared test database of the page. Before launch it will be stored in Canada and this notice will say so. This page uses your browser’s local storage to keep you signed in. It has no advertising or tracking.</p>') +
+      sec('Rules for using it', ul(['Use it honestly. Do not harass anyone or enter someone else’s information.', 'Organizations must keep what they learn confidential and use it only to help the person.', 'Counts of rooms are set by each organization and can change. Space is never guaranteed.', 'This is not an emergency service. In danger, call 911.', 'Sign-in in this test is a demo and is not secure enough for real clients.'])) +
+      sec('Who to contact', '<p class="small">Privacy officer: to be named before launch. For now, use Help, then Send feedback.</p>');
+  }
+  function agreeLine(key, who) {
+    return '<label class="row small"><input type="checkbox" data-dc="' + key + '" ' + (dv(key, false) ? 'checked' : '') + '> <span>' + who + ' I agree to the <button type="button" class="link small" data-act="showprivacy">Privacy and terms</button>.</span></label>';
+  }
+  function profile() {
+    var p = mine(), a = p.assessment, reqs = myRequests().filter(function (r) { return r.status !== 'Withdrawn'; });
+    var ed = R.editProfile;
+    var detail = ed ? fld('ep-name', 'Name', 'text', 'ep_name', '', 'name').replace('value=""', 'value="' + esc(dv('ep_name', p.name)) + '"') +
+      '<div class="field"><label for="ep-sit">Where are you staying right now?</label><select class="input" id="ep-sit" data-d="ep_status"><option value="">Choose one</option>' + SITUATIONS.map(function (s) { return '<option' + (dv('ep_status', p.status) === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="ep-lang">Language you prefer to be helped in</label><select class="input" id="ep-lang" data-d="ep_lang">' + ['English', 'Français', 'العربية', 'Español', 'Mi’kmaq'].map(function (s) { return '<option' + (dv('ep_lang', p.lang) === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></div>' + err() +
+      '<div class="row"><button class="btn" data-act="saveprofile">Save</button><button class="btn ghost" data-act="canceledit">Cancel</button></div><p class="small muted">To change your phone number or email, ask the administrator through Help.</p>'
+      : '<dl class="kv"><dt>Name</dt><dd>' + esc(p.name) + '</dd><dt>Phone</dt><dd>' + esc(showPhone(p.phone) || 'Not added') + '</dd><dt>Email</dt><dd>' + esc(p.email || 'Not added') + '</dd><dt>Situation</dt><dd>' + esc(p.status || 'Not said') + '</dd><dt>Language</dt><dd>' + esc(p.lang) + '</dd><dt>Verified</dt><dd>' + (p.verified ? esc(p.vmethod) : 'Not yet') + '</dd></dl>' +
+      '<div class="row">' + (p.verified ? '' : '<button class="btn sm" data-act="verify">Verify</button>') + '<button class="btn ghost sm" data-act="editprofile">Edit details</button><button class="btn ghost sm" data-act="assess">' + (a ? 'Redo questions' : 'Answer questions') + '</button></div>';
+    return '<h1>Profile</h1><div class="card">' + detail + '</div>' +
+      (a ? '<div class="card"><h3>Your assessment</h3><div>' + levelPill(a.level) + ' <span class="small muted">score ' + a.total + ', ' + fmt(a.t) + '</span></div></div>' : '') +
+      '<div class="card"><h3>Who can see your information</h3>' + (reqs.length ? '<p class="small muted">These organizations can see your details because you sent them a request. Withdraw a request to stop sharing.</p><div class="stack">' + reqs.map(function (r) { return '<div class="row between"><span>' + esc(orgName(r.orgId)) + ' ' + statusPill(r.status) + '</span>' + (r.status === 'Declined' ? '' : '<button class="btn danger sm" data-act="withdraw" data-v="' + r.id + '">Withdraw and stop sharing</button>') + '</div>'; }).join('') + '</div>' : '<p class="small muted">No organization has your details.</p>') +
+      '<hr><h3>Who has looked you up</h3>' + ((p.log || []).length ? '<div class="stack">' + p.log.slice().reverse().slice(0, 12).map(function (l) { return '<div><div>' + esc(l.m) + '</div><div class="small muted">' + fmt(l.t) + '</div></div>'; }).join('') + '</div>' : '<p class="small muted">No one yet.</p>') + '</div>' +
+      '<div class="card"><h3>Your information</h3><p class="small muted">You agreed to the Privacy and terms on ' + fmt(p.agreedAt || p.created) + '.</p><div class="row"><button class="btn ghost sm" data-act="mydata">Download a copy</button><button class="btn ghost sm" data-act="showprivacy">Read Privacy and terms</button></div></div>' +
+      pwCard() + '<div class="card"><h3>Delete my account</h3><p class="small muted">Removes your account, profile and requests.</p>' + (R.confirmDel ? '<div class="row"><button class="btn danger sm" data-act="delete">Yes, delete everything</button><button class="btn ghost sm" data-act="canceldel">Cancel</button></div>' : '<button class="btn danger sm" data-act="askdel" style="align-self:flex-start">Delete my account</button>') + '</div>';
+  }
+
+  /* ---------- shared helpers: unread, downloads, feedback, password ---------- */
+  function unread() {
+    var p = mine(); if (!p) return 0; var seen = p.seen || p.created || '', n = 0;
+    myRequests().forEach(function (r) { (r.events || []).forEach(function (e) { if (e.l !== 'Sent' && e.t > seen) n++; }); (r.messages || []).forEach(function (m) { if (m.from === 'org' && m.t > seen) n++; }); });
+    return n;
+  }
+  function markSeen() { if (unread() > 0) { var p = clone(mine()); R.prevSeen = p.seen || p.created || ''; p.seen = now(); put('people', me(), p); } }
+  function csvCell(v) { v = String(v == null ? '' : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function toCsv(rows) { return rows.map(function (r) { return r.map(csvCell).join(','); }).join('\n'); }
+  function dl(name, text, type) {
+    var local = function () { var b = new Blob([text], { type: type || 'text/csv' }), u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(u); a.remove(); }, 500); };
+    if (STANDALONE || !window.claude || !window.claude.use) { local(); return; }
+    window.claude.use('downloads').then(function (d) { if (!d) { toast('Downloads are not available here.'); return; } return d.save({ filename: name, data: text }).then(function () { toast('Saved ' + name); }); })
+      .catch(function (e) { if (!(e && e.code === 'declined')) toast('The download did not work here.'); });
+  }
+  function feedbackForm() {
+    var kinds = ['Feedback', 'Idea', 'Problem with the app', 'Problem with a listing'];
+    return '<div class="card"><h3>Send feedback</h3><p class="small muted">Tell us what worked, what confused you, or report a problem. The administrator reads every note.</p>' +
+      '<div class="field"><label for="fb-kind">Type</label><select class="input" id="fb-kind" data-d="fb_kind">' + kinds.map(function (k) { return '<option' + (dv('fb_kind', 'Feedback') === k ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="fb-text">Your message</label><textarea class="input" id="fb-text" maxlength="800" data-d="fb_text">' + esc(dv('fb_text', '')) + '</textarea></div>' +
+      (R.fbMsg ? '<p class="small" style="color:var(--ok)" role="status">' + esc(R.fbMsg) + '</p>' : '') + '<button class="btn" data-act="sendfb" style="align-self:flex-start">Send</button></div>';
+  }
+  function pwCard() {
+    return '<div class="card"><h3>Change password</h3>' + fld('cp-old', 'Current password', 'password', 'cp_old', '', 'current-password') + fld('cp-new', 'New password (8 or more characters)', 'password', 'cp_new', '', 'new-password') +
+      (R.pwMsg ? '<p class="small" role="status">' + esc(R.pwMsg) + '</p>' : '') + '<div class="row"><button class="btn ghost sm" data-act="changepw">Change password</button><button class="btn ghost sm" data-act="newrecovery">Make a new recovery code</button></div><p class="small muted">Enter your current password above first. A new recovery code replaces the old one.</p></div>';
+  }
+  function helpView() {
+    var faq = [
+      ['I forgot my password.', 'On the sign-in screen tap “Forgot password?”. Enter the recovery code you saved when you made your account. If you lost it, ask for a reset and the administrator will give you a temporary password.'],
+      ['Is HomeConnect free?', 'Yes. It is free for people looking for housing.'],
+      ['Who can see my information?', 'Only organizations you send a request to, and only after you agree to share with them. You can see who looked you up under Profile, and you can withdraw a request at any time.'],
+      ['What does “verified” mean?', 'A worker or a code confirmed it is really you. Verified profiles are easier for organizations to trust. It does not decide whether you get a room.'],
+      ['What does priority mean?', 'Your five answers give a simple priority level. Organizations use it to sort requests. It never decides on its own, and people can still be helped at any level.'],
+      ['I do not have a phone or email.', 'Tap “Show me open beds tonight” on the first screen. You do not need an account to see which shelters have space and how to call them. A shelter worker can also help you create an account.'],
+      ['A shelter says no. What now?', 'Try another shelter under Find, call 211, or ask a worker to help you. A no from one place is not a no from everyone.']
+    ];
+    return '<h1>Help</h1>' + crisis() +
+      '<div class="card"><h3>What to bring to a shelter</h3><ul class="tlist"><li>Photo ID if you have it. Most shelters will still help without it.</li><li>Health card and any medication</li><li>Your phone and charger</li><li>Letters about income or benefits</li><li>What you need for children or pets</li></ul></div>' +
+      '<div class="card"><h3>Common questions</h3>' + faq.map(function (f) { return '<details><summary>' + esc(f[0]) + '</summary><p class="small muted" style="margin-top:6px">' + esc(f[1]) + '</p></details>'; }).join('') + '</div><div class="card"><h3>Privacy and terms</h3><p class="small muted">How your information is used, and your choices.</p><button class="btn ghost sm" data-act="showprivacy" style="align-self:flex-start">Read Privacy and terms</button></div>' + feedbackForm();
+  }
+  var QUICK = ['We have a place for you tonight. Please arrive before intake closes.', 'Please bring photo ID if you have it. If not, come anyway and we will help.', 'We are full tonight. You are on our waitlist and we will contact you when space opens.', 'Please call us on the number in our listing.'];
+
+  /* ---------- organization console ---------- */
+  function personCard(uid, r) {
+    var p = mem.people[uid];
+    if (!p) return '<p class="small muted">This account was deleted.</p>';
+    var full = !!(r && r.consentAt && r.status !== 'Withdrawn'), a = p.assessment;
+    if (!full) return '<dl class="kv"><dt>Verified</dt><dd>' + (p.verified ? esc(p.vmethod) : 'No') + '</dd><dt>Details</dt><dd class="muted">' + (r && r.status === 'Withdrawn' ? 'This person withdrew their request and no longer shares details.' : 'Shared only when the person sends you a request.') + '</dd></dl>';
+    return '<dl class="kv"><dt>Phone</dt><dd>' + esc(showPhone(p.phone) || 'Not added') + '</dd><dt>Email</dt><dd>' + esc(p.email || 'Not added') + '</dd><dt>Verified</dt><dd>' + (p.verified ? esc(p.vmethod) : 'No') + '</dd>' +
+      '<dt>Situation</dt><dd>' + esc(p.status || 'Not said') + '</dd><dt>Language</dt><dd>' + esc(p.lang) + '</dd><dt>Assessment</dt><dd>' + (a ? esc(a.level + ' (score ' + a.total + ')') : 'Not done') + '</dd><dt>Documents</dt><dd>' + esc(p.docs.map(function (d) { return d.type + ': ' + d.status; }).join(' · ')) + '</dd></dl>';
+  }
+  function org() {
+    var o = myOrg();
+    if (!o) return '<div class="card"><p>This organization could not be found.</p></div>';
+    var pend = orgRequests(o.id).filter(function (r) { return r.status === 'Pending'; }).length;
+    var tabs = [['overview', 'Overview'], ['requests', 'Requests' + (pend ? ' <span class="badge" style="position:static">' + pend + '</span>' : '')], ['listing', 'Services and listing'], ['team', 'Team'], ['verify', 'Verify a person']];
+    var head = (o.status === 'Suspended' ? '<div class="banner warn">Your listing is suspended by the administrator and is hidden from people searching.</div>' : '') +
+      '<div class="row between"><div><span class="label">' + (o.kind === 'shelter' ? 'Shelter' : 'Housing provider') + '</span><h1>' + esc(o.name) + '</h1></div>' + (o.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill idle">Awaiting verification</span>') + '</div>' +
+      '<div class="stabs" role="tablist">' + tabs.map(function (t) { return '<button role="tab" data-act="otab" data-v="' + t[0] + '" class="' + (R.otab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>';
+    if (R.otab === 'requests') return head + orgRequestsView(o);
+    if (R.otab === 'listing') return head + listing(o);
+    if (R.otab === 'team') return head + team(o);
+    if (R.otab === 'verify') return head + verifyPerson(o);
+    return head + overview(o);
+  }
+  function overview(o) {
+    var rs = orgRequests(o.id), c = function (f) { return rs.filter(f).length; };
+    var week = Date.now() - 7 * 864e5, wait = c(function (r) { return r.status === 'Waitlisted'; });
+    var occ = o.total ? Math.round((o.total - o.available) / o.total * 100) : 0;
+    return (o.available > 0 && wait > 0 ? '<div class="banner"><b>' + wait + ' waitlisted.</b> You have ' + o.available + ' ' + unit(o) + (o.available > 1 ? 's' : '') + ' open. <button class="link" data-act="gowait">Review the waitlist</button></div>' : '') +
+      '<div class="stats"><div class="stat"><b>' + c(function (r) { return r.status === 'Pending'; }) + '</b><span>Need action</span></div><div class="stat"><b>' + c(function (r) { return consumes(o, r.status); }) + '</b><span>' + (o.kind === 'shelter' ? 'Accepted' : 'Offers') + '</span></div><div class="stat"><b>' + wait + '</b><span>Waitlisted</span></div><div class="stat"><b>' + c(function (r) { return new Date(r.t).getTime() > week; }) + '</b><span>New this week</span></div></div>' +
+      '<div class="card"><h2>' + (o.kind === 'shelter' ? 'Rooms available' : 'Units available') + '</h2><div class="row"><button class="btn ghost" data-act="avail" data-v="-1" aria-label="One fewer available">−</button><div style="font-family:var(--display);font-size:38px;min-width:64px;text-align:center">' + o.available + '</div><button class="btn ghost" data-act="avail" data-v="1" aria-label="One more available">+</button><span class="muted">of ' + o.total + ' total</span></div>' +
+      '<div class="meter"><b style="width:' + occ + '%"></b></div><div class="small muted">' + occ + '% full' + (o.availT ? ' · updated ' + ago(o.availT) : '') + '. Keep this current: people plan their night around it.</div>' +
+      '<div class="row"><label class="small" for="tot">Total ' + unit(o) + 's</label><input class="input" id="tot" type="number" min="0" style="max-width:110px" data-d="tot" value="' + esc(dv('tot', o.total)) + '"><button class="btn ghost sm" data-act="settotal">Update total</button></div></div>' +
+      '<div class="card"><label class="switch"><span><b>Accepting new requests</b><br><span class="small muted">Turn off to pause new requests without hiding your listing.</span></span><input type="checkbox" data-org="accepting" ' + (o.accepting === false ? '' : 'checked') + '></label></div>' +
+      '<div class="card"><h3>Announcement</h3><p class="small muted">Shown on your listing. For example, intake times tonight or items you need.</p><textarea class="input" id="ann" data-d="ann" maxlength="240" placeholder="Short notice for people searching">' + esc(dv('ann', o.announcement || '')) + '</textarea><button class="btn sm" data-act="saveann" style="align-self:flex-start">Post announcement</button></div>' +
+      '<div class="card"><h3>Recent activity</h3>' + ((o.log || []).length ? '<ul class="tlist">' + o.log.slice().reverse().slice(0, 8).map(function (l) { return '<li>' + esc(l.m) + ' <span class="muted">' + fmt(l.t) + '</span></li>'; }).join('') + '</ul>' : '<p class="small muted">Nothing yet.</p>') + '</div>';
+  }
+  function orgRequestsView(o) {
+    var rank = { High: 0, Medium: 1, Standard: 2 }, f = R.ofilter;
+    var items = orgRequests(o.id).filter(function (r) { return f === 'all' ? true : f === 'active' ? consumes(o, r.status) : r.status === f; })
+      .sort(function (a, b) { var u = (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0); if (u) return u; var d = (rank[a.level] != null ? rank[a.level] : 3) - (rank[b.level] != null ? rank[b.level] : 3); return d || (a.t < b.t ? 1 : -1); });
+    var acts = ACTIONS[o.kind];
+    return '<div class="row between"><div class="seg">' + FILTERS.map(function (x) { return '<button class="chip ' + (f === x[0] ? 'on' : '') + '" data-act="ofilter" data-v="' + x[0] + '">' + (x[0] === 'active' ? (o.kind === 'shelter' ? 'Accepted' : 'Offers') : x[1]) + '</button>'; }).join('') + '</div><button class="btn ghost sm" data-act="orgcsv">Download CSV</button></div>' +
+      (items.length ? items.map(function (r) {
+        var open = R.open === r.id, dec = R.declining === r.id;
+        return '<div class="card"><div class="row between"><div class="grow"><b>' + esc(r.name) + '</b><div class="small muted">' + fmt(r.t) + '</div></div>' + levelPill(r.level) + statusPill(r.status) + '</div>' + reqTags(r) +
+          '<div class="row"><button class="btn ghost sm" data-act="open" data-v="' + r.id + '">' + (open ? 'Hide' : 'Profile and messages') + '</button>' +
+          acts.map(function (s) { return '<button class="btn ' + (r.status === s ? '' : 'ghost') + ' sm" data-act="' + (s === 'Declined' ? 'declinebox' : 'setstatus') + '" data-id="' + r.id + '" data-v="' + s + '">' + s + '</button>'; }).join('') + '</div>' +
+          (dec ? '<div class="card inner"><div class="field"><label for="reason">Reason (the person will see this)</label><input class="input" id="reason" data-d="reason" value="' + esc(dv('reason', '')) + '" placeholder="e.g. We only serve women and children"></div><div class="row"><button class="btn danger sm" data-act="confirmdecline" data-id="' + r.id + '">Decline request</button><button class="btn ghost sm" data-act="canceldecline">Cancel</button></div></div>' : '') +
+          (open ? personCard(r.uid, r) + '<hr>' + thread(r, 'org') + '<div class="qr">' + QUICK.map(function (q, i) { return '<button class="chip" data-act="quick" data-id="' + r.id + '" data-v="' + i + '">' + esc((function (z) { return z.length > 38 ? z.slice(0, 36) + '…' : z; })(tr(q))) + '</button>'; }).join('') + '</div>' +
+            '<div class="field"><label for="sn_' + r.id + '">Private staff note (the person cannot see this)</label><textarea class="input" id="sn_' + r.id + '" data-d="sn_' + r.id + '">' + esc(dv('sn_' + r.id, r.staffNote || '')) + '</textarea></div><button class="btn ghost sm" data-act="savenote" data-id="' + r.id + '" style="align-self:flex-start">Save note</button>' : '') + '</div>';
+      }).join('') : '<div class="card"><p class="muted">Nothing here. ' + (f === 'Pending' ? 'New requests from people appear here.' : 'Try another filter.') + '</p></div>');
+  }
+  function listing(o) {
+    var kv = function (id, label, key, val, type) { return '<div class="field"><label for="' + id + '">' + label + '</label><input class="input" id="' + id + '" type="' + (type || 'text') + '" data-d="' + key + '" value="' + esc(dv(key, val || '')) + '"></div>'; };
+    return '<div class="card"><h2>Services and listing</h2><p class="small muted">This is what people see when they search.</p>' +
+      kv('l-name', 'Organization name', 'l_name', o.name) + kv('l-area', 'Area', 'l_area', o.area) + kv('l-addr', 'Street address (optional)', 'l_addr', o.address) +
+      '<div class="grid2">' + kv('l-phone', 'Phone', 'l_phone', o.phone, 'tel') + kv('l-email', 'Public email', 'l_email', o.email, 'email') + '</div>' +
+      kv('l-hours', 'Hours and intake times', 'l_hours', o.hours) +
+      '<div class="field"><label for="l-desc">About us</label><textarea class="input" id="l-desc" data-d="l_desc" maxlength="400">' + esc(dv('l_desc', o.desc || '')) + '</textarea></div>' +
+      '<div class="field"><label for="l-rules">Intake rules and what to bring</label><textarea class="input" id="l-rules" data-d="l_rules" maxlength="300">' + esc(dv('l_rules', o.rules || '')) + '</textarea></div>' +
+      '<label class="switch"><span><b>Keep my address private</b><br><span class="small muted">Recommended for shelters that must stay confidential. People see the address only after you accept their request.</span></span><input type="checkbox" data-org="addrPrivate" ' + (o.addrPrivate ? 'checked' : '') + '></label>' +
+      '<div class="field"><label>Who we serve</label>' + chips('l_groups', GROUPS, null, o.groups || []) + '</div>' +
+      '<div class="field"><label>Services we offer</label>' + chips('l_services', SERVICES, null, o.services || []) + '</div>' + err() +
+      '<button class="btn" data-act="savelisting">Save listing</button></div>' + pwCard() + feedbackForm() +
+      '<div class="card"><h3>Account</h3><button class="link" data-act="showprivacy" style="align-self:flex-start">Read Privacy and terms</button><p class="small muted">Signed in as ' + esc((account() && (account().email || showPhone(account().phone))) || 'the sample organization') + '.</p><button class="btn ghost sm" data-act="signout" style="align-self:flex-start">Sign out</button></div>';
+  }
+  function team(o) {
+    var members = vals('accounts').filter(function (a) { return a.role === 'org' && (a.orgId || a.id) === o.id; });
+    var owner = !!(ses.demo || ses.accId === o.id);
+    return (R.tempPw ? '<div class="banner"><b>Temporary password for ' + esc(R.tempPw.name) + ':</b> <span class="mono">' + esc(R.tempPw.pw) + '</span>. Share it privately and ask them to change it under Services and listing. <button class="link" data-act="hidetemp">Hide</button></div>' : '') + '<div class="card"><h2>Team</h2><p class="small muted">Share this code with colleagues. When they create an account they choose “Join your team” and enter it.</p><div class="row"><span class="demo">' + esc(o.invite || 'No code yet') + '</span>' + (owner ? '<button class="btn ghost sm" data-act="newinvite">' + (o.invite ? 'Make a new code' : 'Create code') + '</button>' : '') + '</div></div>' +
+      '<div class="card"><h3>People with access</h3>' + (members.length ? '<div class="scroll"><table class="table"><thead><tr><th>Name</th><th>Contact</th><th>Role</th><th></th></tr></thead><tbody>' + members.map(function (a) {
+        return '<tr><td>' + esc(a.name) + '</td><td>' + esc(a.email || showPhone(a.phone)) + '</td><td>' + (a.id === o.id ? 'Owner' : 'Staff') + (a.disabled ? ' (removed)' : '') + '</td><td>' + (owner && a.id !== o.id ? '<div class="row"><button class="btn ghost sm" data-act="resetpw" data-v="' + a.id + '">Reset password</button><button class="btn ' + (a.disabled ? '' : 'danger') + ' sm" data-act="toggleacct" data-v="' + a.id + '">' + (a.disabled ? 'Restore' : 'Remove') + '</button></div>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table></div>' : '<p class="small muted">No team accounts yet.</p>') + '</div>';
+  }
+  function verifyPerson(o) {
+    var r = R.lookup ? mem.people[R.lookup] : null;
+    return '<div class="card"><h2>Verify a person</h2><p class="small muted">Look someone up by their exact phone number or email, check their ID in person, then confirm. Each lookup is recorded on their profile.</p>' +
+      '<div class="row"><input class="input grow" id="lk" data-d="lkq" placeholder="902-555-0100 or name@example.com" value="' + esc(dv('lkq', '')) + '" aria-label="Phone number or email"><button class="btn" data-act="lookup">Look up</button></div>' +
+      (R.lookedUp && !r ? '<p class="err">No account with that number or email.</p>' : '') +
+      (r ? '<div class="card inner"><h3>' + esc(r.name) + '</h3>' + '<dl class="kv"><dt>Verified</dt><dd>' + (r.verified ? esc(r.vmethod) : 'No') + '</dd></dl>' + (r.verified ? '<span class="pill ok" style="align-self:flex-start">Already verified</span>' : '<button class="btn" data-act="confirmid" style="align-self:flex-start">I checked their ID, mark verified</button>') + '</div>' : '') + '</div>';
+  }
+
+  /* ---------- administrator console ---------- */
+  function admin() {
+    var tabs = [['orgs', 'Organizations'], ['people', 'People'], ['reqs', 'All requests'], ['accts', 'Accounts'], ['feedback', 'Feedback' + (vals('feedback').length ? ' (' + vals('feedback').length + ')' : '')], ['tools', 'Tools']];
+    var persons = vals('people').length, orgs = allOrgs().length, reqs = vals('requests').length, open = 0;
+    listed().forEach(function (o) { open += o.available || 0; });
+    var head = '<div><span class="label">Administrator</span><h1>Everything in HomeConnect</h1></div><div class="stats"><div class="stat"><b>' + persons + '</b><span>People</span></div><div class="stat"><b>' + orgs + '</b><span>Organizations</span></div><div class="stat"><b>' + reqs + '</b><span>Requests</span></div><div class="stat"><b>' + open + '</b><span>Rooms and units open</span></div></div>' +
+      (R.tempPw ? '<div class="banner"><b>Temporary password for ' + esc(R.tempPw.name) + ':</b> <span class="mono">' + esc(R.tempPw.pw) + '</span>. Share it privately and ask them to change it under Profile. <button class="link" data-act="hidetemp">Hide</button></div>' : '') +
+      '<div class="stabs" role="tablist">' + tabs.map(function (t) { return '<button role="tab" data-act="atab" data-v="' + t[0] + '" class="' + (R.atab === t[0] ? 'on' : '') + '">' + t[1] + '</button>'; }).join('') + '</div>';
+    if (R.atab === 'people') {
+      var ps = vals('people');
+      return head + '<div class="card"><div class="scroll"><table class="table"><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Verified</th><th>Priority</th><th>Requests</th></tr></thead><tbody>' + (ps.length ? ps.map(function (p) { return '<tr><td>' + esc(p.name) + '</td><td>' + esc(showPhone(p.phone)) + '</td><td>' + esc(p.email || '') + '</td><td>' + (p.verified ? 'Yes' : 'No') + '</td><td>' + esc(p.assessment ? p.assessment.level : '') + '</td><td>' + vals('requests').filter(function (r) { return r.uid === p.id; }).length + '</td></tr>'; }).join('') : '<tr><td colspan="6" class="muted">No people yet.</td></tr>') + '</tbody></table></div></div>';
+    }
+    if (R.atab === 'reqs') {
+      var rs = vals('requests').sort(function (a, b) { return a.updated < b.updated ? 1 : -1; });
+      return head + '<div class="card"><div class="scroll"><table class="table"><thead><tr><th>Person</th><th>Organization</th><th>Status</th><th>Updated</th></tr></thead><tbody>' + (rs.length ? rs.map(function (r) { return '<tr><td>' + esc(r.name) + '</td><td>' + esc(orgName(r.orgId)) + '</td><td>' + esc(r.status) + '</td><td>' + fmt(r.updated) + '</td></tr>'; }).join('') : '<tr><td colspan="4" class="muted">No requests yet.</td></tr>') + '</tbody></table></div></div>';
+    }
+    if (R.atab === 'accts') {
+      var as = vals('accounts');
+      return head + '<div class="card"><div class="scroll"><table class="table"><thead><tr><th>Name</th><th>Type</th><th>Phone</th><th>Email</th><th>Created</th><th></th></tr></thead><tbody>' + (as.length ? as.map(function (a) { return '<tr><td>' + esc(a.name) + '</td><td>' + esc(a.role) + '</td><td>' + esc(showPhone(a.phone)) + '</td><td>' + esc(a.email || '') + '</td><td>' + fmt(a.created) + '</td><td><div class="row"><button class="btn ' + (a.disabled ? '' : 'danger') + ' sm" data-act="toggleacct" data-v="' + a.id + '">' + (a.disabled ? 'Enable' : 'Disable') + '</button><button class="btn ghost sm" data-act="resetpw" data-v="' + a.id + '">Reset password</button></div></td></tr>'; }).join('') : '<tr><td colspan="6" class="muted">No accounts yet.</td></tr>') + '</tbody></table></div></div>';
+    }
+    if (R.atab === 'feedback') {
+      var fs = vals('feedback').sort(function (a, b) { return a.t < b.t ? 1 : -1; });
+      return head + (fs.length ? fs.map(function (f) { return '<div class="card"><div class="row between"><span class="pill ' + (f.kind.indexOf('Problem') === 0 ? 'crit' : '') + '">' + esc(f.kind) + '</span><span class="small muted">' + esc(f.from) + ' · ' + fmt(f.t) + '</span></div><p>' + esc(f.text) + '</p><div class="row">' + (f.accId && mem.accounts[f.accId] ? '<button class="btn sm" data-act="resetpw" data-v="' + f.accId + '">Reset their password</button>' : '') + '<button class="btn ghost sm" data-act="resolvefb" data-v="' + f.id + '">Mark done</button></div></div>'; }).join('') : '<div class="card"><p class="muted">No feedback yet. Testers can send it from the Help tab or the organization Services tab.</p></div>');
+    }
+    if (R.atab === 'tools') {
+      var demo = vals('people').filter(function (p) { return p.id.indexOf('demo-') === 0; }).length;
+      return head + '<div class="card"><h3>Demo people and requests</h3><p class="small muted">Adds four fictional people with requests to the listed organizations, so every organization has something to review while you test. Demo people have no login.</p><div class="row"><button class="btn" data-act="seeddemo">Add demo data</button><button class="btn ghost" data-act="removedemo"' + (demo ? '' : ' disabled') + '>Remove demo data' + (demo ? ' (' + demo + ' people)' : '') + '</button></div></div>' +
+        '<div class="card"><h3>Exports</h3><div class="row"><button class="btn ghost sm" data-act="csvall">All requests (CSV)</button><button class="btn ghost sm" data-act="csvaccts">All accounts (CSV)</button></div></div>';
+    }
+    return head + allOrgs().map(function (o) {
+      var rs = orgRequests(o.id), sample = o.id.indexOf('sample-') === 0;
+      return '<div class="card"><div class="row between"><div class="grow"><h3>' + esc(o.name) + '</h3><div class="small muted">' + (o.kind === 'shelter' ? 'Shelter' : 'Housing provider') + ' · ' + esc(o.area || '') + (sample ? ' · sample listing' : '') + '</div></div>' + (o.status === 'Suspended' ? '<span class="pill crit">Suspended</span>' : '') + (o.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill idle">Not verified</span>') + '</div>' +
+        '<div class="small muted">' + o.available + ' of ' + o.total + ' ' + unit(o) + 's open · ' + rs.length + ' requests (' + rs.filter(function (r) { return r.status === 'Pending'; }).length + ' pending)' + (o.availT ? ' · counts updated ' + ago(o.availT) : '') + '</div>' +
+        '<div class="row"><button class="btn ' + (o.verified ? 'ghost' : '') + ' sm" data-act="orgverify" data-v="' + o.id + '">' + (o.verified ? 'Remove verified badge' : 'Mark verified') + '</button><button class="btn ' + (o.status === 'Suspended' ? '' : 'danger') + ' sm" data-act="orgsuspend" data-v="' + o.id + '">' + (o.status === 'Suspended' ? 'Restore listing' : 'Suspend listing') + '</button></div></div>';
+    }).join('');
+  }
+
+  /* ---------- render ---------- */
+  function view() {
+    if (!ui.lang && !ses) return langChooser();
+    if (R.pv) return privacyView();
+    if (loading) return '<div class="card"><p class="muted">Loading…</p></div>';
+    if (R.showCode && ses && ses.accId) return codeScreen();
+    var r = role();
+    if (r === 'admin') return admin();
+    if (r === 'org') return org();
+    if (r === 'person') {
+      if (!mine()) return '<div class="card"><p>Your profile could not be found. Sign out and create a new account.</p></div>';
+      if (R.sub === 'verify') return verifyView();
+      if (R.sub === 'assess') return assessView();
+      return { home: home, find: find, req: requests, vault: vault, help: helpView, profile: profile }[R.tab]();
+    }
+    if (R.screen === 'guest') return guestView();
+    if (R.screen === 'person') return personAuth();
+    if (R.screen === 'org') return orgAuth();
+    if (R.screen === 'admin') return adminAuth();
+    return welcome();
+  }
+  function paint() { top(); $('#app').innerHTML = view(); tabbar(); applyLang(); trDom($('#top')); trDom($('#app')); trDom($('#tabs')); [].forEach.call(document.querySelectorAll('.chip'), function (c) { if (!c.hasAttribute('aria-pressed')) c.setAttribute('aria-pressed', c.classList.contains('on') ? 'true' : 'false'); }); }
+  function paintSoft() { var el = document.activeElement; if (el && /INPUT|SELECT|TEXTAREA/.test(el.tagName) && $('#app').contains(el)) return; paint(); }
+
+  /* ---------- accounts ---------- */
+  function validPw(pw) { return String(pw || '').length >= 8; }
+  function makeAccount(roleName, name, phone, email, pw) {
+    var keys = [];
+    if (phone) keys.push(sha256('p:' + phone));
+    if (email) keys.push(sha256('e:' + email));
+    if (!keys.length) return { error: 'Enter a phone number, an email, or both.' };
+    for (var i = 0; i < keys.length; i++) if (mem.logins[keys[i]]) return { error: 'An account already uses that phone number or email. Try signing in.' };
+    var id = 'u' + rid(12), salt = rid(16), hash = hashPw(pw, salt), rawCode = rid(12).toUpperCase(), rsalt = rid(16);
+    put('accounts', id, { role: roleName, name: name, phone: phone || '', email: email || '', created: now(), disabled: false, rec: { salt: rsalt, hash: hashPw(rawCode, rsalt) } });
+    keys.forEach(function (k) { put('logins', k, { accId: id, salt: salt, hash: hash }); });
+    return { id: id, code: fmtCode(rawCode) };
+  }
+  function fmtCode(c) { return c.slice(0, 4) + '-' + c.slice(4, 8) + '-' + c.slice(8, 12); }
+  function cleanCode(c) { return String(c || '').replace(/[^a-z0-9]/gi, '').toUpperCase(); }
+  function newRecovery(accId) { var raw = rid(12).toUpperCase(), salt = rid(16), a = clone(mem.accounts[accId]); a.rec = { salt: salt, hash: hashPw(raw, salt) }; put('accounts', accId, a); return fmtCode(raw); }
+  function startSession(accId, extra) { ses = { accId: accId }; if (extra) for (var k in extra) ses[k] = extra[k]; lsSet(SES, ses); R.draft = {}; R.errs = ''; R.tab = 'home'; R.sub = ''; R.open = null; R.otab = 'overview'; }
+  function sampleBlurb() { return ''; }
+
+  /* ---------- actions ---------- */
+  function emptyDocs() { return DOCS.map(function (t) { return { type: t, name: null, status: 'Missing' }; }); }
+  function setStatus(r, st, note) {
+    var o = orgById(r.orgId), was = consumes(o, r.status), will = consumes(o, st);
+    if (!was && will && o.available < 1) { toast('No ' + unit(o) + 's available. Raise the count first.'); return false; }
+    if (was !== will) orgEdit(o.id, function (x) { x.available = was ? Math.min(x.total, x.available + 1) : x.available - 1; });
+    r = clone(r); r.status = st; r.updated = now(); r.events = (r.events || []).concat([{ l: st, t: now(), note: note || '' }]);
+    if (st === 'Declined') r.reason = note || '';
+    put('requests', r.id, r); return true;
+  }
+  var A = {
+    home: function () { R.screen = 'welcome'; R.errs = ''; R.draft = {}; },
+    pick: function (v) { R.screen = v; R.auth = v === 'admin' ? 'in' : 'up'; R.errs = ''; R.draft = {}; R.reqFor = null; scrollTo(0, 0); },
+    setlang: function (v) { ui.lang = v === 'fr' ? 'fr' : 'en'; lsSet(UIK, ui); R.draft = {}; scrollTo(0, 0); },
+    togglelang: function () { ui.lang = isFr() ? 'en' : 'fr'; lsSet(UIK, ui); },
+    lg: function () { ui.lg = !ui.lg; lsSet(UIK, ui); document.body.classList.toggle('lg', !!ui.lg); },
+    showprivacy: function () { R.pv = true; scrollTo(0, 0); },
+    closeprivacy: function () { R.pv = false; scrollTo(0, 0); },
+    report: function (v) { R.tab = 'help'; R.sub = ''; R.draft.fb_kind = 'Problem with a listing'; R.draft.fb_text = 'About ' + orgName(v) + ': '; R.fbMsg = ''; scrollTo(0, 0); },
+    editprofile: function () { R.editProfile = true; R.errs = ''; },
+    canceledit: function () { R.editProfile = false; R.errs = ''; ['ep_name', 'ep_status', 'ep_lang'].forEach(function (k) { delete R.draft[k]; }); },
+    saveprofile: function () {
+      var p = clone(mine()), d = R.draft, nm = (d.ep_name !== undefined ? d.ep_name : p.name).trim();
+      if (!nm) { R.errs = 'Name cannot be empty.'; return; }
+      p.name = nm; if (d.ep_status !== undefined) p.status = d.ep_status; if (d.ep_lang !== undefined) p.lang = d.ep_lang; put('people', me(), p);
+      myRequests().forEach(function (r) { if (r.name !== nm) { var x = clone(r); x.name = nm; put('requests', x.id, x); } });
+      R.editProfile = false; R.errs = ''; ['ep_name', 'ep_status', 'ep_lang'].forEach(function (k) { delete d[k]; }); toast('Details saved.');
+    },
+    mydata: function () {
+      var p = mine(), a = account(), out = { exportedAt: now(), account: { name: a.name, phone: a.phone, email: a.email, created: a.created }, profile: { situation: p.status, language: p.lang, verified: p.verified, verifiedBy: p.vmethod, assessment: p.assessment, documents: p.docs, agreedToPrivacyAt: p.agreedAt || p.created }, requests: myRequests().map(function (r) { return { organization: orgName(r.orgId), status: r.status, sent: r.t, updated: r.updated, sharedAt: r.consentAt, details: { people: r.hh, needsPlaceTonight: !!r.urgent, pets: !!r.pets, accessible: !!r.access, note: r.note || '' }, history: r.events, messages: r.messages }; }), whoLookedYouUp: p.log || [] };
+      dl('my-homeconnect-information.json', JSON.stringify(out, null, 2), 'application/json');
+    },
+    authmode: function (v) { R.auth = v; R.errs = ''; R.fgMsg = ''; },
+    forgot: function () { R.auth = 'forgot'; R.errs = ''; R.fgMsg = ''; },
+    copycode: function () { try { navigator.clipboard.writeText(R.showCode).then(function () { toast('Code copied.'); }, function () { toast('Could not copy. Write the code down instead.'); }); } catch (e) { toast('Could not copy. Write the code down instead.'); } },
+    codesaved: function () { R.showCode = null; },
+    recover: function () {
+      if (Date.now() < (R.lockUntil || 0)) { R.errs = 'Too many tries. Wait a minute and try again.'; return; }
+      var d = R.draft, key = loginKey(d.fg_id), lg = key ? mem.logins[key] : null, a = lg ? mem.accounts[lg.accId] : null;
+      if (!key) { R.errs = 'Enter the phone number or email you signed up with.'; return; }
+      if (!validPw(d.fg_pw)) { R.errs = 'Choose a new password with at least 8 characters.'; return; }
+      if (!a || !a.rec || hashPw(cleanCode(d.fg_code), a.rec.salt) !== a.rec.hash) {
+        R.fails = (R.fails || 0) + 1; if (R.fails >= 5) { R.lockUntil = Date.now() + 60000; R.fails = 0; }
+        R.errs = 'That recovery code does not match. If you lost it, use “Ask for a reset” below.'; return;
+      }
+      if (a.disabled) { R.errs = 'This account has been disabled. Contact the administrator.'; return; }
+      if (a.role !== R.screen) { R.errs = a.role === 'org' ? 'This is an organization account. Go back and choose “I offer housing services”.' : 'This is a personal account. Go back and choose “I need housing help”.'; return; }
+      setPassword(a.id, d.fg_pw); var nc = newRecovery(a.id); R.fails = 0;
+      startSession(a.id, a.role === 'org' ? { orgId: a.orgId || a.id } : null); R.showCode = nc; toast('Password reset. You are signed in.');
+    },
+    resetrequest: function () {
+      var d = R.draft, key = loginKey(d.fg_id);
+      if (!key) { R.errs = 'Enter the phone number or email you signed up with, so we know who to help.'; return; }
+      var lg = mem.logins[key], a = lg ? mem.accounts[lg.accId] : null; R.errs = '';
+      if (a) put('feedback', 'f_' + rid(8), { kind: 'Password reset request', text: 'Please reset my password. Contact: ' + (d.fg_id || '').trim(), from: a.name + ' (' + a.role + ')', accId: a.id, t: now() });
+      R.fgMsg = 'Thank you. If that account exists, the administrator has been told. Check back soon, or ask your organization owner or the person who invited you.';
+    },
+    newrecovery: function () {
+      var a = account(); if (!a) { R.pwMsg = 'Sample organizations do not have a recovery code.'; return; }
+      var keys = Object.keys(mem.logins).filter(function (k) { return mem.logins[k].accId === a.id; }), lg = keys.length ? mem.logins[keys[0]] : null;
+      if (!lg || hashPw(R.draft.cp_old || '', lg.salt) !== lg.hash) { R.pwMsg = 'Enter your current password first.'; return; }
+      R.draft.cp_old = ''; R.pwMsg = ''; R.showCode = newRecovery(a.id);
+    },
+    tg: function (v, el) { var k = el.dataset.k, cur = (R.draft[k] !== undefined ? R.draft[k] : null); if (cur === null) { var o = myOrg(); cur = k === 'l_groups' && o ? (o.groups || []).slice() : k === 'l_services' && o ? (o.services || []).slice() : k === 'ogroups' ? ['Adults'] : []; } cur = cur.slice(); var i = cur.indexOf(v); if (i >= 0) cur.splice(i, 1); else cur.push(v); R.draft[k] = cur; },
+    'signup-person': function () {
+      var d = R.draft, name = (d.name || '').trim(), phone = normPhone(d.phone), email = normEmail(d.email);
+      if (!name) { R.errs = 'Enter your name.'; return; }
+      if ((d.phone || '').trim() && !phone) { R.errs = 'Enter a 10-digit phone number, or leave it empty.'; return; }
+      if ((d.email || '').trim() && !email) { R.errs = 'That email does not look right.'; return; }
+      if (!validPw(d.pw)) { R.errs = 'Choose a password with at least 8 characters.'; return; }
+      if (!d.agree) { R.errs = 'Please tick the box to agree to the Privacy and terms.'; return; }
+      var res = makeAccount('person', name, phone, email, d.pw);
+      if (res.error) { R.errs = res.error; return; }
+      put('people', res.id, { name: name, phone: phone, email: email, lang: d.lang || (isFr() ? 'Français' : 'English'), status: d.status || '', verified: false, vmethod: '', assessment: null, docs: emptyDocs(), agreedAt: now(), log: [], created: now(), seen: now() });
+      startSession(res.id); R.showCode = res.code; toast('Account created. Welcome.');
+    },
+    'signup-org': function () {
+      var d = R.draft, name = (d.oname || '').trim(), phone = normPhone(d.phone), email = normEmail(d.email);
+      var total = Math.max(0, parseInt(d.ototal, 10) || 0), avail = Math.max(0, parseInt(d.oavail, 10) || 0);
+      if (!name) { R.errs = 'Enter your organization’s name.'; return; }
+      if (!total) { R.errs = 'Enter how many rooms or units you have in total.'; return; }
+      if (avail > total) { R.errs = 'Available cannot be more than the total.'; return; }
+      if (!(d.cname || '').trim()) { R.errs = 'Enter your name.'; return; }
+      if ((d.phone || '').trim() && !phone) { R.errs = 'Enter a 10-digit phone number, or leave it empty.'; return; }
+      if ((d.email || '').trim() && !email) { R.errs = 'That email does not look right.'; return; }
+      if (!validPw(d.pw)) { R.errs = 'Choose a password with at least 8 characters.'; return; }
+      if (!d.oagree) { R.errs = 'Please tick the box to agree to the Privacy and terms.'; return; }
+      var res = makeAccount('org', d.cname.trim(), phone, email, d.pw);
+      if (res.error) { R.errs = res.error; return; }
+      put('orgs', res.id, { kind: d.okind || 'shelter', name: name, area: (d.oarea || '').trim(), address: '', phone: showPhone(phone), email: email, hours: '', desc: '', rules: '', groups: d.ogroups || ['Adults'], services: d.oservices || [], total: total, available: avail, availT: now(), accepting: true, announcement: '', status: 'Listed', verified: false, invite: rid(6).toUpperCase(), log: [{ m: 'Organization registered', t: now() }], created: now() });
+      var a = clone(mem.accounts[res.id]); a.orgId = res.id; put('accounts', res.id, a);
+      startSession(res.id, { orgId: res.id }); R.showCode = res.code; toast('Organization registered.');
+    },
+    'signup-staff': function () {
+      var d = R.draft, code = (d.jcode || '').trim().toUpperCase(), phone = normPhone(d.phone), email = normEmail(d.email);
+      var o = code ? vals('orgs').filter(function (x) { return x.invite === code && x.status !== 'Suspended'; })[0] : null;
+      if (!o) { R.errs = 'That team code was not found. Check it with the person who registered your organization.'; return; }
+      if (!(d.cname || '').trim()) { R.errs = 'Enter your name.'; return; }
+      if ((d.phone || '').trim() && !phone) { R.errs = 'Enter a 10-digit phone number, or leave it empty.'; return; }
+      if ((d.email || '').trim() && !email) { R.errs = 'That email does not look right.'; return; }
+      if (!validPw(d.pw)) { R.errs = 'Choose a password with at least 8 characters.'; return; }
+      if (!d.oagree) { R.errs = 'Please tick the box to agree to the Privacy and terms.'; return; }
+      var res = makeAccount('org', d.cname.trim(), phone, email, d.pw);
+      if (res.error) { R.errs = res.error; return; }
+      var a = clone(mem.accounts[res.id]); a.orgId = o.id; put('accounts', res.id, a); orgLog(o.id, a.name + ' joined the team');
+      startSession(res.id, { orgId: o.id }); R.showCode = res.code; toast('You joined ' + o.name + '.');
+    },
+    signin: function (v, el) {
+      if (Date.now() < (R.lockUntil || 0)) { R.errs = 'Too many tries. Wait a minute and try again.'; return; }
+      var d = R.draft, key = loginKey(d.si_id), lg = key ? mem.logins[key] : null;
+      if (!key) { R.errs = 'Enter a phone number or an email.'; return; }
+      if (!lg || hashPw(d.si_pw || '', lg.salt) !== lg.hash) {
+        R.fails = (R.fails || 0) + 1; if (R.fails >= 5) { R.lockUntil = Date.now() + 60000; R.fails = 0; }
+        R.errs = 'That phone number, email or password is not right. If you forgot your password, ask the administrator or your organization owner to reset it.'; return;
+      }
+      var a = mem.accounts[lg.accId];
+      if (!a) { R.errs = 'That account no longer exists.'; return; }
+      if (a.disabled) { R.errs = 'This account has been disabled. Contact the administrator.'; return; }
+      var kind = el.dataset.kind;
+      if (a.role !== kind) { R.errs = a.role === 'org' ? 'This is an organization account. Go back and choose “I offer housing services”.' : 'This is a personal account. Go back and choose “I need housing help”.'; return; }
+      R.fails = 0; startSession(a.id, a.role === 'org' ? { orgId: a.orgId || a.id } : null); toast('Signed in.');
+    },
+    demoorg: function () {
+      var s = SAMPLE[0]; if (!mem.orgs[s.id]) put('orgs', s.id, Object.assign(clone(s), { accepting: true, status: 'Listed', verified: false, invite: rid(6).toUpperCase(), log: [{ m: 'Sample organization opened', t: now() }] }));
+      ses = { accId: null, orgId: s.id, demo: true }; lsSet(SES, ses); R.otab = 'overview'; R.errs = '';
+    },
+    enteradmin: function () { ses = { admin: true }; lsSet(SES, ses); R.atab = 'orgs'; },
+    signout: function () { ses = null; lsSet(SES, null); R.screen = 'welcome'; R.draft = {}; R.open = null; R.code = ''; R.sub = ''; R.confirmDel = false; R.reqFor = null; R.tempPw = null; },
+    tab: function (v) { R.tab = v; R.sub = ''; R.open = null; R.reqFor = null; R.fbMsg = ''; R.pwMsg = ''; scrollTo(0, 0); },
+    back: function () { R.sub = ''; R.code = ''; R.errs = ''; R.draft.ans = null; },
+    verify: function () { R.sub = 'verify'; },
+    assess: function () { R.sub = 'assess'; R.draft.ans = null; },
+    open: function (v) { R.open = R.open === v ? null : v; },
+    fg: function (v) { R.fG = v; },
+    findkind: function (v) { R.find = v; R.fG = 'All'; R.open = null; R.reqFor = null; },
+    otab: function (v) { R.otab = v; R.open = null; R.errs = ''; R.fbMsg = ''; R.pwMsg = ''; },
+    ofilter: function (v) { R.ofilter = v; R.open = null; },
+    gowait: function () { R.otab = 'requests'; R.ofilter = 'Waitlisted'; },
+    atab: function (v) { R.atab = v; },
+    sendcode: function () { R.code = String(Math.floor(100000 + Math.random() * 900000)); R.errs = ''; },
+    checkcode: function () {
+      if ((R.draft.codeIn || '').trim() !== R.code) { R.errs = 'That code does not match. Try again.'; return; }
+      var p = clone(mine()); p.verified = true; p.vmethod = 'Code check (demo)'; put('people', me(), p); R.code = ''; R.errs = ''; R.sub = ''; toast('You are verified.');
+    },
+    ans: function (v, el) { R.draft.ans = R.draft.ans || clone((mine().assessment || {}).answers || {}); R.draft.ans[el.dataset.q] = +v; },
+    saveassess: function () { var a = R.draft.ans, s = score(a), p = clone(mine()); p.assessment = { answers: a, total: s.total, level: s.level, t: now() }; put('people', me(), p); R.sub = ''; R.draft.ans = null; toast('Saved. Priority: ' + s.level); },
+    request: function (v) {
+      R.reqFor = v; ['rq_hh', 'rq_urgent', 'rq_pets', 'rq_access', 'rq_note', 'rq_consent'].forEach(function (k) { delete R.draft[k]; });
+    },
+    cancelreq: function () { R.reqFor = null; },
+    sendrequest: function (v) {
+      var p = mine(), o = orgById(v), d = R.draft;
+      if (!d.rq_consent) { toast('Tick the box to agree to share your details first.'); return; }
+      var hh = Math.max(1, Math.min(12, parseInt(d.rq_hh, 10) || 1));
+      put('requests', 'r_' + me() + '_' + v, { uid: me(), orgId: v, name: p.name, level: p.assessment ? p.assessment.level : '', status: 'Pending', hh: hh, consentAt: now(), urgent: !!d.rq_urgent && o.kind === 'shelter', pets: !!d.rq_pets, access: !!d.rq_access, note: (d.rq_note || '').trim().slice(0, 300), events: [{ l: 'Sent', t: now(), note: '' }], messages: [], t: now(), updated: now() });
+      R.reqFor = null; delete d.rq_consent; toast((o.kind === 'housing' ? 'Application sent to ' : 'Request sent to ') + o.name);
+    },
+    withdraw: function (v) { var r = mem.requests[v]; if (r) setStatus(r, 'Withdrawn', ''); },
+    sendmsg: function (v, el) {
+      var r = mem.requests[el.dataset.id], k = 'msg_' + el.dataset.id, text = (R.draft[k] || '').trim(); if (!r || !text) return;
+      sendMsg(r, el.dataset.side, text); R.draft[k] = '';
+    },
+    quick: function (v, el) { var r = mem.requests[el.dataset.id]; if (r) sendMsg(r, 'org', QUICK[+v]); },
+    savenote: function (v, el) { var r = mem.requests[el.dataset.id]; if (!r) return; r = clone(r); r.staffNote = (R.draft['sn_' + r.id] !== undefined ? R.draft['sn_' + r.id] : r.staffNote || '').slice(0, 500); put('requests', r.id, r); toast('Note saved.'); },
+    upload: function (v) { uploadTarget = +v; $('#docInput').value = ''; $('#docInput').click(); },
+    rmdoc: function (v) { var p = clone(mine()); p.docs[+v] = { type: p.docs[+v].type, name: null, status: 'Missing' }; put('people', me(), p); },
+    askdel: function () { R.confirmDel = true; }, canceldel: function () { R.confirmDel = false; },
+    'delete': function () {
+      var id = me();
+      myRequests().forEach(function (r) { del('requests', r.id); });
+      Object.keys(mem.logins).forEach(function (k) { if (mem.logins[k].accId === id) del('logins', k); });
+      del('people', id); del('accounts', id); ses = null; lsSet(SES, null); R.screen = 'welcome'; R.confirmDel = false; toast('Your account was deleted.');
+    },
+    avail: function (v) { var o = myOrg(); var n = Math.max(0, Math.min(o.total, o.available + (+v))); if (n === o.available) return; orgEdit(o.id, function (x) { x.available = n; x.availT = now(); }); orgLog(o.id, 'Available set to ' + n); },
+    settotal: function () {
+      var o = myOrg(), t = parseInt(R.draft.tot, 10); if (isNaN(t) || t < 0) { toast('Enter a number.'); return; }
+      orgEdit(o.id, function (x) { x.total = t; x.available = Math.min(x.available, t); x.availT = now(); }); orgLog(o.id, 'Total set to ' + t); delete R.draft.tot; toast('Total updated.');
+    },
+    saveann: function () { var o = myOrg(); orgEdit(o.id, function (x) { x.announcement = (R.draft.ann !== undefined ? R.draft.ann : x.announcement || '').trim(); }); orgLog(o.id, 'Announcement updated'); delete R.draft.ann; toast('Announcement posted.'); },
+    savelisting: function () {
+      var o = myOrg(), d = R.draft; var nm = (d.l_name !== undefined ? d.l_name : o.name).trim();
+      if (!nm) { R.errs = 'Name cannot be empty.'; return; }
+      orgEdit(o.id, function (x) {
+        x.name = nm; if (d.l_area !== undefined) x.area = d.l_area.trim(); if (d.l_addr !== undefined) x.address = d.l_addr.trim(); if (d.l_phone !== undefined) x.phone = d.l_phone.trim(); if (d.l_email !== undefined) x.email = d.l_email.trim();
+        if (d.l_hours !== undefined) x.hours = d.l_hours.trim(); if (d.l_desc !== undefined) x.desc = d.l_desc.trim(); if (d.l_rules !== undefined) x.rules = d.l_rules.trim();
+        if (d.l_groups) x.groups = d.l_groups; if (d.l_services) x.services = d.l_services;
+      });
+      ['l_name', 'l_area', 'l_addr', 'l_phone', 'l_email', 'l_hours', 'l_desc', 'l_rules', 'l_groups', 'l_services'].forEach(function (k) { delete R.draft[k]; });
+      R.errs = ''; orgLog(o.id, 'Listing updated'); toast('Listing saved.');
+    },
+    newinvite: function () { var o = myOrg(); orgEdit(o.id, function (x) { x.invite = rid(6).toUpperCase(); }); orgLog(o.id, 'New team code created'); },
+    setstatus: function (v, el) { var r = mem.requests[el.dataset.id]; if (!r) return; if (setStatus(r, v, '')) { orgLog(r.orgId, r.name + ': ' + v); personLog(r.uid, orgName(r.orgId) + ' updated your request: ' + v); } },
+    declinebox: function (v, el) { R.declining = el.dataset.id; R.draft.reason = ''; },
+    canceldecline: function () { R.declining = null; },
+    confirmdecline: function (v, el) {
+      var r = mem.requests[el.dataset.id]; if (!r) return;
+      if (setStatus(r, 'Declined', (R.draft.reason || '').trim())) { orgLog(r.orgId, r.name + ': Declined'); personLog(r.uid, orgName(r.orgId) + ' updated your request: Declined'); }
+      R.declining = null; R.draft.reason = '';
+    },
+    lookup: function () {
+      var q = (R.draft.lkq || '').trim(), key = loginKey(q), hit = null; R.lookedUp = true; R.lookup = null;
+      if (key && mem.logins[key]) hit = mem.people[mem.logins[key].accId];
+      if (hit) { R.lookup = hit.id; personLog(hit.id, orgName(ses.orgId) + ' looked you up to verify you'); }
+    },
+    confirmid: function () { var p = mem.people[R.lookup]; if (!p) return; p = clone(p); p.verified = true; p.vmethod = 'In person at ' + orgName(ses.orgId); put('people', p.id, p); orgLog(ses.orgId, 'Verified ' + p.name + ' in person'); toast('Marked as verified.'); },
+    sendfb: function () {
+      var text = (R.draft.fb_text || '').trim(); if (!text) { R.fbMsg = ''; toast('Write a message first.'); return; }
+      var r = role(), from = r === 'person' ? 'Person: ' + (mine() ? mine().name : '') : r === 'org' ? 'Organization: ' + (myOrg() ? myOrg().name : '') : 'Administrator';
+      put('feedback', 'f_' + rid(8), { kind: R.draft.fb_kind || 'Feedback', text: text.slice(0, 800), from: from, t: now() });
+      R.draft.fb_text = ''; R.fbMsg = 'Thank you. Your note was sent.';
+    },
+    changepw: function () {
+      var a = account(); if (!a) { R.pwMsg = 'Sample organizations do not have a password.'; return; }
+      var keys = Object.keys(mem.logins).filter(function (k) { return mem.logins[k].accId === a.id; }), lg = keys.length ? mem.logins[keys[0]] : null;
+      if (!lg || hashPw(R.draft.cp_old || '', lg.salt) !== lg.hash) { R.pwMsg = 'Your current password is not right.'; return; }
+      if (!validPw(R.draft.cp_new)) { R.pwMsg = 'The new password needs at least 8 characters.'; return; }
+      setPassword(a.id, R.draft.cp_new); R.draft.cp_old = ''; R.draft.cp_new = ''; R.pwMsg = 'Password changed.';
+    },
+    orgcsv: function () {
+      var o = myOrg(), rows = [['Name', 'Phone', 'Email', 'Status', 'Priority', 'People', 'Needs place tonight', 'Pets', 'Accessible', 'Note', 'Requested', 'Updated']];
+      orgRequests(o.id).forEach(function (r) { var p = mem.people[r.uid] || {}; rows.push([r.name, showPhone(p.phone), p.email || '', r.status, r.level || '', r.hh || 1, r.urgent ? 'Yes' : '', r.pets ? 'Yes' : '', r.access ? 'Yes' : '', r.note || '', r.t, r.updated]); });
+      dl('requests-' + o.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.csv', toCsv(rows));
+    },
+    csvall: function () { var rows = [['Person', 'Organization', 'Status', 'Priority', 'Requested', 'Updated']]; vals('requests').forEach(function (r) { rows.push([r.name, orgName(r.orgId), r.status, r.level || '', r.t, r.updated]); }); dl('all-requests.csv', toCsv(rows)); },
+    csvaccts: function () { var rows = [['Name', 'Type', 'Phone', 'Email', 'Created', 'Disabled']]; vals('accounts').forEach(function (a) { rows.push([a.name, a.role, showPhone(a.phone), a.email || '', a.created, a.disabled ? 'Yes' : '']); }); dl('accounts.csv', toCsv(rows)); },
+    resetpw: function (v) {
+      var a = mem.accounts[v]; if (!a) return;
+      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || ses.accId === ses.orgId) && a.id !== ses.accId);
+      if (!ok) { toast('You cannot reset that account.'); return; }
+      var pw = rid(8); setPassword(v, pw); R.tempPw = { name: a.name, pw: pw };
+    },
+    hidetemp: function () { R.tempPw = null; },
+    resolvefb: function (v) { del('feedback', v); },
+    seeddemo: function () {
+      var people = [['Alex Morgan', '9025550141', 'Staying in a shelter', { q1: 3, q2: 1, q3: 0, q4: 3, q5: 2 }, true], ['Priya Shah', '9025550142', 'Couch surfing', { q1: 2, q2: 3, q3: 0, q4: 2, q5: 2 }, true], ['Marcus Bell', '9025550143', 'Sleeping outside', { q1: 4, q2: 1, q3: 2, q4: 3, q5: 2 }, false], ['Sofia Rossi', '9025550144', 'At risk of losing housing', { q1: 1, q2: 2, q3: 0, q4: 1, q5: 0 }, false]];
+      var targets = listed().filter(function (o) { return o.accepting !== false; }); if (!targets.length) return;
+      var notes = ['', 'I have two kids with me.', 'Can arrive after 8 p.m.', ''];
+      people.forEach(function (d, i) {
+        var s = score(d[3]), id = 'demo-' + (i + 1);
+        put('people', id, { name: d[0], phone: d[1], email: '', lang: 'English', status: d[2], verified: d[4], vmethod: d[4] ? 'In person (demo)' : '', assessment: { answers: d[3], total: s.total, level: s.level, t: now() }, docs: emptyDocs(), agreedAt: now(), log: [], created: now(), seen: now() });
+        [0, 1].forEach(function (j) {
+          var o = targets[(i + j * 3) % targets.length], rid2 = 'r_' + id + '_' + o.id; if (mem.requests[rid2]) return;
+          put('requests', rid2, { uid: id, orgId: o.id, name: d[0], level: s.level, status: 'Pending', consentAt: now(), hh: i === 1 ? 3 : 1, urgent: i === 2, pets: i === 3, access: i === 2 && j === 0, note: notes[i], events: [{ l: 'Sent', t: now(), note: '' }], messages: [], t: now(), updated: now() });
+        });
+      });
+      toast('Demo people and requests added.');
+    },
+    removedemo: function () {
+      vals('requests').forEach(function (r) { if (r.uid.indexOf('demo-') === 0) del('requests', r.id); });
+      vals('people').forEach(function (p) { if (p.id.indexOf('demo-') === 0) del('people', p.id); });
+      toast('Demo data removed.');
+    },
+    orgverify: function (v) { var on = !orgById(v).verified; orgEdit(v, function (o) { o.verified = on; }); orgLog(v, on ? 'Marked verified by the administrator' : 'Verified badge removed by the administrator'); },
+    orgsuspend: function (v) { var sus = orgById(v).status !== 'Suspended'; orgEdit(v, function (o) { o.status = sus ? 'Suspended' : 'Listed'; }); orgLog(v, sus ? 'Listing suspended by the administrator' : 'Listing restored by the administrator'); },
+    toggleacct: function (v) {
+      var a = mem.accounts[v]; if (!a) return;
+      var ok = role() === 'admin' || (role() === 'org' && a.role === 'org' && (a.orgId || a.id) === ses.orgId && (ses.demo || ses.accId === ses.orgId) && a.id !== ses.accId);
+      if (!ok) { toast('You cannot change that account.'); return; }
+      a = clone(a); a.disabled = !a.disabled; put('accounts', v, a);
+    }
+  };
+  function sendMsg(r, side, text) {
+    r = clone(r); r.messages = (r.messages || []).concat([{ from: side, text: text.slice(0, 500), t: now() }]); r.updated = now(); put('requests', r.id, r);
+    if (side === 'org') personLog(r.uid, orgName(r.orgId) + ' sent you a message');
+  }
+  function setPassword(accId, pw) {
+    var salt = rid(16), hash = hashPw(pw, salt);
+    Object.keys(mem.logins).forEach(function (k) { if (mem.logins[k].accId === accId) put('logins', k, { accId: accId, salt: salt, hash: hash }); });
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]'); if (!el) return;
+    var act = el.dataset.act;
+    if (act.indexOf('goto:') === 0) { var t = act.slice(5); if (t === 'findh') { R.find = 'housing'; t = 'find'; } else if (t === 'find') R.find = 'shelter'; A.tab(t); }
+    else if (A[act]) A[act](el.dataset.v, el);
+    if (role() === 'person' && R.tab === 'req' && !R.sub) markSeen();
+    paint();
+    if (/^(tab|pick|otab|atab|back|home|findkind|signin|signup|recover|codesaved|forgot|authmode|showprivacy|closeprivacy|goto:|enteradmin|demoorg|signout)/.test(act)) $('#app').focus({ preventScroll: true });
+  });
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.dataset.d) {
+      var k = t.dataset.d;
+      if (k === 'fq') { R.fQ = t.value; var pos = t.selectionStart; paint(); var n = $('#fq'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) {} } }
+      else R.draft[k] = t.value;
+    }
+    if (t.dataset.dc) R.draft[t.dataset.dc] = t.checked;
+    if (t.dataset.org) { var o = myOrg(); if (o) { var key = t.dataset.org, val = t.checked; orgEdit(o.id, function (x) { x[key] = val; }); orgLog(o.id, key === 'accepting' ? (val ? 'Started' : 'Paused') + ' accepting requests' : (val ? 'Address set to private' : 'Address made public')); } }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { var f = e.target.closest('.card'); var b = f && f.querySelector('button.btn:not(.ghost):not(.danger)'); if (b && /signin|signup|sendmsg|lookup/.test(b.dataset.act || '')) { e.preventDefault(); b.click(); } } });
+  $('#docInput').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0], p = mine(); if (!f || !p || uploadTarget == null) return;
+    if (f.size > 10 * 1024 * 1024) { toast('That file is over 10 MB.'); return; }
+    p = clone(p); p.docs[uploadTarget] = { type: p.docs[uploadTarget].type, name: f.name.slice(0, 80), status: 'Pending' }; put('people', me(), p); toast('Added ' + f.name);
+  });
+
+  /* ---------- boot ---------- */
+  var saved = lsGet(LS); if (saved) COLL.forEach(function (c) { mem[c] = saved[c] || {}; });
+  if (ses && ses.demo && !mem.orgs[ses.orgId]) ses = null;
+  paint();
+  function boot() {
+    if (STANDALONE || !window.claude || !window.claude.use) return;
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
+      var d = r[0], u = r[1]; if (!d) return;
+      db = d; shared = true; loading = true;
+      mem = { accounts: {}, logins: {}, people: {}, orgs: {}, requests: {}, feedback: {} };
+      var left = COLL.length, finish = function () { if (--left === 0) { loading = false; if (ses && !ses.admin && !ses.demo && !mem.accounts[ses.accId]) { ses = null; lsSet(SES, null); } paint(); } };
+      COLL.forEach(function (c) { listen(c, finish); });
+      setTimeout(function () { if (loading) { loading = false; paint(); } }, 8000);
+      Promise.resolve(u && u.isOwner ? u.isOwner() : false).then(function (v) { isOwner = !!v; paint(); }).catch(function () {});
+      paint();
+    }).catch(function () {});
+  }
+  boot();
+  var lastAct = Date.now();
+  ['click', 'keydown', 'input', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { lastAct = Date.now(); }, true); });
+  setInterval(function () { if (ses && Date.now() - lastAct > 20 * 60000) { A.signout(); paint(); toast('You were signed out after 20 minutes without activity. Sign in again to continue.'); } }, 30000);
+  if (STANDALONE && 'serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(function () {});
+  window.__hc = { mem: function () { return mem; }, R: R, sha: sha256, ses: function () { return ses; } };
+})();
+</script>
+
+</body></html>
