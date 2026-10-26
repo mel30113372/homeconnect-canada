@@ -45,7 +45,9 @@ button { cursor:pointer; }
 .logo { width:34px; height:34px; border-radius:9px; overflow:hidden; display:block; }
 .logo svg { width:100%; height:100%; display:block; }
 .pride { flex-basis:100%; height:5px; border-radius:3px; background:linear-gradient(90deg,#E40303 0 16.6%,#FF8C00 0 33.3%,#FFED00 0 50%,#008026 0 66.6%,#004DFF 0 83.3%,#750787 0); }
-.brand b { font-family:var(--display); font-size:17px; }
+.brand b { font-family:var(--display); font-size:16px; }
+.modebar { gap:4px !important; }
+@media (max-width:560px) { .modebar > span.small, .modebar .pill { display:none; } .brand { gap:7px; } .brand b { font-size:14px; } .logo { width:30px; height:30px; } .modebar .btn.sm { padding:4px 8px; min-height:32px; font-size:13px; } .top { gap:6px 10px; padding-block-start:6px; } .pride { height:4px; } }
 .modebar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 
 .card { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px; min-width:0; }
@@ -56,8 +58,13 @@ button { cursor:pointer; }
 .choice .pic { display:block; height:104px; border-radius:10px; background:var(--p-houses) center 40%/cover; margin-bottom:8px; }
 .choice .pic.org { background-image:var(--p-table); background-position:center 55%; }
 .choice .pic.beds { background-image:var(--p-desk); background-position:center 35%; }
+.homepage { display:flex; flex-direction:column; gap:10px; min-height:calc(100dvh - 190px); }
+.homepage .tiles { flex:1; grid-auto-rows:minmax(74px,1fr); }
 .tiles { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
-.tile { position:relative; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; text-align:center; border:0; border-radius:14px; padding:14px 10px; min-height:96px; color:#fff; grid-column:span 3; box-shadow:0 1px 3px rgba(43,38,33,.18); }
+.tile.c3 { grid-column:span 2; padding:8px 4px; gap:3px; } .tile.c3 b { font-size:13px; } .tile.c3 svg { width:26px; height:26px; }
+.tile.c-ro { background:#B23A5B; }
+.note1 { font-size:12px; text-align:center; color:var(--muted); }
+.tile { position:relative; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:center; text-align:center; border:0; border-radius:14px; padding:14px 10px; min-height:74px; color:#fff; grid-column:span 3; box-shadow:0 1px 3px rgba(43,38,33,.18); }
 .tile svg { width:30px; height:30px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .tile b { font-family:var(--display); font-size:15px; line-height:1.2; }
 .tile .sub { font-size:12.5px; opacity:.95; }
@@ -70,18 +77,26 @@ button { cursor:pointer; }
 .hsearch input { flex:1; min-width:0; border:0; background:transparent; padding:10px 4px; font-size:15px; outline:none; }
 .hsearch:focus-within { border-color:var(--accent); }
 .hsearch button { border:0; background:#C9540F; color:#fff; border-radius:9px; padding:9px 14px; font-weight:600; }
-.banner-photo { background-image:linear-gradient(90deg,rgba(20,16,12,.72) 0%,rgba(20,16,12,.25) 62%,rgba(20,16,12,0) 100%), var(--p-welcome); background-size:cover; background-position:center 24%; border-radius:14px; min-height:150px; padding:16px; display:flex; flex-direction:column; justify-content:center; gap:4px; color:#fff; }
+.banner-photo { background-image:linear-gradient(90deg,rgba(20,16,12,.72) 0%,rgba(20,16,12,.25) 62%,rgba(20,16,12,0) 100%), var(--p-welcome); background-size:cover; background-position:center 24%; border-radius:14px; min-height:100px; padding:10px 16px; display:flex; flex-direction:column; justify-content:center; gap:4px; color:#fff; }
 .banner-photo .pill { background:#fff !important; align-self:flex-start; }
 .banner-photo h1 { color:#fff; font-size:26px; } .banner-photo p { max-width:62%; font-size:15px; }
-.emerg { grid-column:1 / -1; background:#2E7D43; color:#fff; border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px; box-shadow:0 1px 3px rgba(43,38,33,.18); }
+.emerg { grid-column:1 / -1; background:#2E7D43; color:#fff; border-radius:14px; padding:8px 10px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 1px 3px rgba(43,38,33,.18); }
 .emerg h3 { color:#fff; text-align:center; } .emerg .row { display:flex; gap:8px; } .emerg .sos { background:rgba(255,255,255,.95); color:#1F5A30; } .emerg .sos.red { background:#C62828; color:#fff; }
 .emerg .link { color:#fff; align-self:center; }
+.wl { display:flex; flex-direction:column; gap:10px; }
+.choice.row3 { flex-direction:row; align-items:center; gap:12px; padding:10px; color:#fff; border:0; box-shadow:0 1px 3px rgba(43,38,33,.2); }
+.choice.row3 .pic { width:72px; height:72px; flex:none; margin:0; border-radius:10px; }
+.choice.row3 .tx { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.choice.row3 h2 { color:#fff; font-size:17px; } .choice.row3 p { font-size:13px; opacity:.95; } .choice.row3 .label { color:#fff; opacity:.9; font-size:11px; }
+.choice.row3.k1 { background:#C9540F; } .choice.row3.k2 { background:#2C6AA0; } .choice.row3.k3 { background:#2E7D43; }
+.choice.row3:hover { filter:brightness(1.06); }
+.hero.photo.title { min-height:165px; padding:14px 18px; }
 .res { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .res button { display:flex; align-items:center; gap:10px; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px; min-height:56px; box-shadow:0 1px 2px rgba(43,38,33,.08); font-weight:600; }
 .res svg { width:26px; height:26px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 .res .r1 { color:#C9540F; } .res .r2 { color:#6F4A9A; } .res .r3 { color:#17796F; } .res .r4 { color:#2C6AA0; }
 .res span.t { color:var(--ink); }
-.hero.photo.title { background-image:linear-gradient(rgba(20,16,12,.0),rgba(20,16,12,.80)), var(--p-welcome); background-size:cover; background-position:center 20%; min-height:300px; }
+.hero.photo.title { background-image:linear-gradient(rgba(20,16,12,.0),rgba(20,16,12,.80)), var(--p-welcome); background-size:cover; background-position:center 20%; min-height:165px; }
 .hero.photo.title .label { color:#F0B35B; }
 .sos { flex:1; min-width:84px; text-align:center; border-radius:12px; padding:10px 6px; background:var(--crit); color:var(--surface); font:700 22px/1.1 var(--mono); text-decoration:none; }
 .sos span { display:block; margin-top:3px; font:600 11px/1.2 var(--body); letter-spacing:.02em; }
@@ -317,6 +332,14 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
 "A safe place to start.": "Un endroit sûr pour commencer.",
 "Find a room tonight": "Trouver une chambre ce soir",
 "My documents": "Mes documents",
+"Demo · made-up information only": "Démo · renseignements fictifs seulement",
+"Shared test · use made-up names only": "Test partagé · utilisez seulement des noms fictifs",
+"Housing": "Logement",
+"None yet": "Aucune pour l’instant",
+"Find a bed, apply for housing and keep your papers in one place.": "Trouvez un lit, postulez à un logement et gardez vos documents au même endroit.",
+"Ask for a bed, apply and keep your papers.": "Demandez un lit, postulez et gardez vos documents.",
+"Update rooms and answer requests.": "Mettez à jour les chambres et répondez aux demandes.",
+"See which shelters have space now.": "Voyez quels refuges ont de la place maintenant.",
 "rooms open": "chambres libres",
 "Local resources": "Ressources locales",
 "My profile": "Mon profil",
@@ -914,6 +937,8 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
   [/^rooms open across (\d+) shelters right now$/, 'chambres libres dans $1 refuges en ce moment'],
   [/^Hello, (.+)$/, 'Bonjour, $1'],
   [/^Welcome, (.+)$/, 'Bienvenue, $1'],
+  [/^(\d+) of (\d+) done$/, '$1 sur $2 faits'],
+  [/^(\d+) new$/, '$1 nouveau(x)'],
   [/^(\d+) rooms? open$/, function (m) { return m[1] + (m[1] === '1' ? ' chambre libre' : ' chambres libres'); }],
   [/^(\d+) units? open$/, function (m) { return m[1] + (m[1] === '1' ? ' logement libre' : ' logements libres'); }],
   [/^(\d+) of (\d+) rooms in use$/, '$1 chambres sur $2 occupées'],
@@ -1119,14 +1144,14 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     var steps = STANDALONE
       ? ['Choose “I need housing help” and create an account with a made-up name and number.', 'Sign out, then choose “I offer housing services” and register a shelter, or open the sample organization.', 'Sign back in as the person and send a request. Then sign in as the organization and accept or decline it.', 'Open Help and send feedback. Use the Administrator link to see everything.']
       : ['Choose “I need housing help” and create an account with a made-up name and number.', 'On a second phone or browser window, choose “I offer housing services” and register a shelter, or open the sample organization.', 'Send a request from the person account. Accept or decline it from the organization, and send a message.', 'Open Help and send feedback about anything that confused you.'];
-    return modeNote() +
-      '<div class="hero photo title"><span class="label">HomeConnect Canada</span><h1>A safe place to start.</h1><p>HomeConnect connects people who need housing with the shelters and housing providers who can help.</p></div>' +
-      crisis() +
-      '<button class="choice" data-act="pick" data-v="person"><span class="pic" role="img" aria-label="Neighbours smiling and pointing toward a house"></span><span class="label">For people</span><h2>I need housing help</h2><p class="muted">Create an account or sign in to ask for a bed, apply for housing and keep your documents in one place.</p><span class="go">Continue →</span></button>' +
-      '<button class="choice" data-act="pick" data-v="org"><span class="pic org" role="img" aria-label="Housing workers around a table, planning together"></span><span class="label">For organizations</span><h2>I offer housing services</h2><p class="muted">Shelters and housing providers update rooms, review requests and talk with the people who apply.</p><span class="go">Continue →</span></button>' +
-      '<button class="choice" data-act="pick" data-v="guest"><span class="pic beds" role="img" aria-label="Welcome desk staff pointing the way"></span><span class="label">No account needed</span><h2>Show me open beds tonight</h2><p class="muted">See which shelters have space right now and how to reach them.</p><span class="go">Look now →</span></button>' +
-      '<details class="card"><summary>How to test this app with friends</summary><ol class="tlist" style="padding-left:18px;margin-top:10px">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol><p class="small muted">Use made-up names and numbers. Shelters and providers listed are fictional.</p></details>' +
-      '<p class="small muted" style="text-align:center"><button class="link small" data-act="showprivacy">Privacy and terms</button> · ' + ((STANDALONE || !shared || isOwner) ? '<button class="link small" data-act="pick" data-v="admin">Administrator</button>' : 'Administrator access is for the owner of this app.') + '</p>';
+    return '<div class="wl">' + homeNote() +
+      '<div class="hero photo title"><span class="label">HomeConnect Canada</span><h1>A safe place to start.</h1><p>Find a bed, apply for housing and keep your papers in one place.</p></div>' +
+      '<div class="emerg" role="region" aria-label="Help right now"><h3>Need help right now?</h3><div class="row"><a class="sos red" href="tel:911">911<span>Emergency</span></a><a class="sos" href="tel:988">988<span>Crisis line</span></a><a class="sos" href="tel:211">211<span>Services</span></a></div></div>' +
+      '<button class="choice row3 k1" data-act="pick" data-v="person"><span class="pic" role="img" aria-label="Neighbours smiling and pointing toward a house"></span><span class="tx"><span class="label">For people</span><h2>I need housing help</h2><p>Ask for a bed, apply and keep your papers.</p></span></button>' +
+      '<button class="choice row3 k2" data-act="pick" data-v="org"><span class="pic org" role="img" aria-label="Housing workers around a table, planning together"></span><span class="tx"><span class="label">For organizations</span><h2>I offer housing services</h2><p>Update rooms and answer requests.</p></span></button>' +
+      '<button class="choice row3 k3" data-act="pick" data-v="guest"><span class="pic beds" role="img" aria-label="Welcome desk staff pointing the way"></span><span class="tx"><span class="label">No account needed</span><h2>Show me open beds tonight</h2><p>See which shelters have space now.</p></span></button>' +
+      '<details class="card" style="padding:10px 14px"><summary>How to test this app with friends</summary><ol class="tlist" style="padding-left:18px;margin-top:10px">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol><p class="small muted">Use made-up names and numbers. Shelters and providers listed are fictional.</p></details>' +
+      '<p class="small muted" style="text-align:center"><button class="link small" data-act="showprivacy">Privacy and terms</button> · ' + ((STANDALONE || !shared || isOwner) ? '<button class="link small" data-act="pick" data-v="admin">Administrator</button>' : 'Administrator access is for the owner of this app.') + '</p></div>';
   }
   function authTabs(joinable) {
     return '<div class="stabs" role="tablist"><button role="tab" class="' + (R.auth === 'up' ? 'on' : '') + '" data-act="authmode" data-v="up">Create account</button>' + (joinable ? '<button role="tab" class="' + (R.auth === 'join' ? 'on' : '') + '" data-act="authmode" data-v="join">Join your team</button>' : '') + '<button role="tab" class="' + (R.auth === 'in' ? 'on' : '') + '" data-act="authmode" data-v="in">Sign in</button></div>';
@@ -1202,34 +1227,44 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       [reqs.some(function (r) { return orgById(r.orgId) && orgById(r.orgId).kind === 'housing'; }), 'Apply for housing', 'Apply once, follow progress here.', 'goto:findh', 'Browse']
     ];
   }
-  function home() {
+  function homeData() {
     var p = mine(), open = 0, count = 0;
     listed().forEach(function (o) { if (o.kind === 'shelter' && o.accepting !== false && o.available > 0) { open += o.available; count++; } });
-    var steps = nextSteps(p), doneN = steps.filter(function (s) { return s[0]; }).length;
-    var myReqs = myRequests(), accN = myReqs.filter(function (r) { return r.status === 'Accepted'; }).length, docN = p.docs.filter(function (d) { return d.status !== 'Missing'; }).length;
-    var feed = [];
+    var steps = nextSteps(p), feed = [];
     myRequests().forEach(function (r) {
       (r.events || []).forEach(function (e) { feed.push({ t: e.t, m: orgName(r.orgId) + ': ' + e.l + (e.note ? ' (' + e.note + ')' : '') }); });
       (r.messages || []).filter(function (m) { return m.from === 'org'; }).forEach(function (m) { feed.push({ t: m.t, m: orgName(r.orgId) + ' sent a message' }); });
     });
     feed.sort(function (a, b) { return a.t < b.t ? 1 : -1; });
-    return modeNote() +
-      '<div class="banner-photo"><h1>Welcome, ' + esc(first()) + '</h1><p>' + open + ' rooms open across ' + count + ' shelters right now</p><div class="row">' + (p.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill warn">Not verified yet</span>') + '</div></div>' +
+    return { p: p, open: open, count: count, steps: steps, doneN: steps.filter(function (s) { return s[0]; }).length, feed: feed };
+  }
+  function backBtn() { return '<button class="btn ghost sm" data-act="back" style="align-self:flex-start">← Back</button>'; }
+  function stepsView() {
+    var h = homeData(), steps = h.steps, doneN = h.doneN;
+    return backBtn() + '<div class="card"><div class="row between"><h2>Next steps</h2><span class="small muted">' + doneN + ' of ' + steps.length + ' done</span></div><div class="meter"><b style="width:' + (doneN / steps.length * 100) + '%"></b></div><div>' +
+      steps.map(function (s) { return '<div class="check"><div class="tick ' + (s[0] ? 'done' : '') + '">' + TICK + '</div><div class="grow"><b>' + s[1] + '</b><div class="small muted">' + s[2] + '</div></div>' + (s[0] ? '' : '<button class="btn ghost sm" data-act="' + s[3] + '">' + s[4] + '</button>') + '</div>'; }).join('') + '</div></div>';
+  }
+  function updatesView() {
+    var feed = homeData().feed;
+    return backBtn() + '<div class="card"><h2>Updates</h2>' + (feed.length ? '<div class="stack">' + feed.slice(0, 12).map(function (f) { return '<div><div>' + esc(f.m) + '</div><div class="small muted">' + fmt(f.t) + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nothing yet. When an organization responds, you will see it here.</p>') + '</div>';
+  }
+  function homeNote() { return '<p class="note1">' + (shared ? 'Shared test · use made-up names only' : 'Demo · made-up information only') + '</p>'; }
+  function home() {
+    var h = homeData(), p = h.p, open = h.open, count = h.count;
+    var myReqs = myRequests(), accN = myReqs.filter(function (r) { return r.status === 'Accepted'; }).length, docN = p.docs.filter(function (d) { return d.status !== 'Missing'; }).length;
+    var upN = h.feed.length;
+    return '<div class="homepage">' +
+      '<div class="banner-photo"><h1>Welcome, ' + esc(first()) + '</h1><p>' + open + ' rooms open across ' + count + ' shelters right now</p><div class="row">' + (p.verified ? '<span class="pill ok">Verified</span>' : '<button class="pill warn" data-act="verify" style="border:0">Not verified yet</button>') + '</div></div>' +
       '<div class="hsearch" role="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="hq" data-d="hq" aria-label="Search shelters and housing" placeholder="Search shelters and housing" autocomplete="off"><button data-act="homesearch">Search</button></div>' +
       '<div class="tiles">' +
       '<button class="tile c-or" data-act="goto:find"><svg viewBox="0 0 24 24">' + ICON.find + '</svg><b>Find a room tonight</b></button>' +
       '<button class="tile count" data-act="goto:find"><span class="n">' + open + '</span><span class="sub">rooms open</span></button>' +
       '<button class="tile c-bl" data-act="goto:req"><svg viewBox="0 0 24 24">' + ICON.req + '</svg><b>My requests</b><span class="sub">' + (myReqs.length ? myReqs.length + ' sent · ' + accN + ' accepted' : 'None sent yet') + '</span>' + (unread() ? '<span class="badge">' + unread() + '</span>' : '') + '</button>' +
       '<button class="tile c-gr" data-act="goto:vault"><svg viewBox="0 0 24 24">' + ICON.vault + '</svg><b>My documents</b><span class="sub">' + docN + ' of ' + p.docs.length + ' papers added</span></button>' +
-      '<div class="emerg" role="region" aria-label="Emergency help"><h3>Emergency help</h3><div class="row"><a class="sos red" href="tel:911">911<span>Emergency</span></a><a class="sos" href="tel:988">988<span>Crisis line</span></a><a class="sos" href="tel:211">211<span>Services</span></a></div><button class="link small" data-act="goto:help">More crisis lines</button></div></div>' +
-      '<h2>Local resources</h2>' +
-      '<div class="res"><button data-act="goto:find"><span class="r1"><svg viewBox="0 0 24 24">' + ICON.find + '</svg></span><span class="t">Shelters</span></button>' +
-      '<button data-act="goto:findh"><span class="r2"><svg viewBox="0 0 24 24">' + ICON.bldg + '</svg></span><span class="t">Housing providers</span></button>' +
-      '<button data-act="goto:help"><span class="r3"><svg viewBox="0 0 24 24">' + ICON.help + '</svg></span><span class="t">Help and what to bring</span></button>' +
-      '<button data-act="goto:profile"><span class="r4"><svg viewBox="0 0 24 24">' + ICON.profile + '</svg></span><span class="t">My profile</span></button></div>' +
-      '<div class="card"><div class="row between"><h2>Next steps</h2><span class="small muted">' + doneN + ' of ' + steps.length + ' done</span></div><div class="meter"><b style="width:' + (doneN / steps.length * 100) + '%"></b></div><div>' +
-      steps.map(function (s) { return '<div class="check"><div class="tick ' + (s[0] ? 'done' : '') + '">' + TICK + '</div><div class="grow"><b>' + s[1] + '</b><div class="small muted">' + s[2] + '</div></div>' + (s[0] ? '' : '<button class="btn ghost sm" data-act="' + s[3] + '">' + s[4] + '</button>') + '</div>'; }).join('') + '</div></div>' +
-      '<div class="card"><h2>Updates</h2>' + (feed.length ? '<div class="stack">' + feed.slice(0, 6).map(function (f) { return '<div><div>' + esc(f.m) + '</div><div class="small muted">' + fmt(f.t) + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nothing yet. When an organization responds, you will see it here.</p>') + '</div>';
+      '<button class="tile c3 c-pu" data-act="steps"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><b>Next steps</b><span class="sub">' + h.doneN + ' of ' + h.steps.length + ' done</span></button>' +
+      '<button class="tile c3 c-te" data-act="updates"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></svg><b>Updates</b><span class="sub">' + (upN ? upN + ' new' : 'None yet') + '</span></button>' +
+      '<button class="tile c3 c-ro" data-act="goto:findh"><svg viewBox="0 0 24 24">' + ICON.bldg + '</svg><b>Housing</b><span class="sub">Apply</span></button>' +
+      '<div class="emerg" role="region" aria-label="Emergency help"><h3>Emergency help</h3><div class="row"><a class="sos red" href="tel:911">911<span>Emergency</span></a><a class="sos" href="tel:988">988<span>Crisis line</span></a><a class="sos" href="tel:211">211<span>Services</span></a></div></div></div></div>';
   }
   function verifyView() {
     var p = mine(), body, via = p.phone ? showPhone(p.phone) : p.email;
@@ -1545,6 +1580,8 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
       if (!mine()) return '<div class="card"><p>Your profile could not be found. Sign out and create a new account.</p></div>';
       if (R.sub === 'verify') return verifyView();
       if (R.sub === 'assess') return assessView();
+      if (R.sub === 'steps') return stepsView();
+      if (R.sub === 'updates') return updatesView();
       return { home: home, find: find, req: requests, vault: vault, help: helpView, profile: profile }[R.tab]();
     }
     if (R.screen === 'guest') return guestView();
@@ -1711,6 +1748,8 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     tab: function (v) { R.tab = v; R.sub = ''; R.open = null; R.reqFor = null; R.fbMsg = ''; R.pwMsg = ''; scrollTo(0, 0); },
     back: function () { R.sub = ''; R.code = ''; R.errs = ''; R.draft.ans = null; },
     verify: function () { R.sub = 'verify'; },
+    steps: function () { R.sub = 'steps'; scrollTo(0, 0); },
+    updates: function () { R.sub = 'updates'; scrollTo(0, 0); },
     assess: function () { R.sub = 'assess'; R.draft.ans = null; },
     open: function (v) { R.open = R.open === v ? null : v; },
     fg: function (v) { R.fG = v; },
