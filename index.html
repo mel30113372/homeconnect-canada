@@ -63,6 +63,20 @@ button { cursor:pointer; }
 .choice .pic { display:block; height:104px; border-radius:10px; background:var(--p-houses) center 40%/cover; margin-bottom:8px; }
 .choice .pic.org { background-image:var(--p-table); background-position:center 55%; }
 .choice .pic.beds { background-image:var(--p-desk); background-position:center 35%; }
+.tiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tile { display:flex; flex-direction:column; gap:6px; align-items:flex-start; text-align:left; border:1px solid var(--line); border-radius:16px; padding:14px; min-height:112px; background:var(--surface); color:var(--ink); position:relative; min-width:0; }
+.tile svg { width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.tile b { font-family:var(--display); font-size:16px; line-height:1.2; }
+.tile .sub { font-size:13px; opacity:.85; }
+.tile.main { grid-column:1 / -1; background:var(--accent); color:var(--accent-ink); border-color:var(--accent); min-height:100px; }
+.tile.main b { font-size:21px; }
+.tile.t2 { background:var(--band); color:var(--band-ink); border-color:var(--band); }
+.tile.t2 svg { color:var(--band-accent); }
+.tile.t3, .tile.t5 { background:var(--accent-soft); border-color:var(--accent-soft); }
+.tile.t3 svg, .tile.t4 svg, .tile.t5 svg { color:var(--accent); }
+.tile .badge { position:absolute; top:10px; right:10px; }
+.sos { flex:1; min-width:84px; text-align:center; border-radius:12px; padding:10px 6px; background:var(--crit); color:var(--surface); font:700 22px/1.1 var(--mono); text-decoration:none; }
+.sos span { display:block; margin-top:3px; font:600 11px/1.2 var(--body); letter-spacing:.02em; }
 .hero .big { font-family:var(--display); font-size:40px; line-height:1; color:var(--band-accent); }
 .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .between { justify-content:space-between; }
@@ -293,6 +307,14 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
 "Use made-up names and phone numbers only.": "Utilisez seulement des noms et des numéros de téléphone inventés.",
 "Sign-in here is a demo and is not secure.": "La connexion ici est une démonstration et n’est pas sécurisée.",
 "A safe place to start.": "Un endroit sûr pour commencer.",
+"Find a room tonight": "Trouver une chambre ce soir",
+"Help and what to bring": "Aide et quoi apporter",
+"Answers, step by step": "Des réponses, étape par étape",
+"None sent yet": "Aucune envoyée pour l’instant",
+"Emergency help": "Aide d’urgence",
+"Emergency": "Urgence",
+"Crisis line": "Ligne de crise",
+"More crisis lines": "Plus de lignes de crise",
 "HomeConnect connects people who need housing with the shelters and housing providers who can help.": "HomeConnect met en relation les personnes qui cherchent un logement et les refuges et fournisseurs de logements qui peuvent les aider.",
 "For people": "Pour les personnes",
 "I need housing help": "J’ai besoin d’aide pour me loger",
@@ -867,6 +889,9 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
 "Only organizations you send a request to, and only after you agree to share with them. You can see who looked you up under Profile, and you can withdraw a request at any time.": "Seulement les organismes à qui vous envoyez une demande, et seulement après que vous avez accepté de partager avec eux. Vous pouvez voir qui vous a recherché sous Profil, et retirer une demande en tout temps."
 };
   var FRP = [
+  [/^(\d+) rooms open now$/, '$1 chambres libres maintenant'],
+  [/^(\d+) sent · (\d+) accepted$/, '$1 envoyée(s) · $2 acceptée(s)'],
+  [/^(\d+) of (\d+) papers added$/, '$1 de $2 documents ajoutés'],
   [/^(.+) was added\.$/, '$1 a été ajouté.'],
   [/^claim code (.+)$/, 'code de réclamation $1'],
   [/^(.+) claimed this organization$/, '$1 a réclamé cet organisme'],
@@ -994,6 +1019,7 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     req: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
     vault: '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
     profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    bldg: '<path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6M8 11h.01M12 11h.01M16 11h.01"/>',
     help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/>'
   };
   var TABS = [['home', 'Home'], ['find', 'Find'], ['req', 'Requests'], ['vault', 'Vault'], ['help', 'Help'], ['profile', 'Profile']];
@@ -1165,6 +1191,7 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     var p = mine(), open = 0, count = 0;
     listed().forEach(function (o) { if (o.kind === 'shelter' && o.accepting !== false && o.available > 0) { open += o.available; count++; } });
     var steps = nextSteps(p), doneN = steps.filter(function (s) { return s[0]; }).length;
+    var myReqs = myRequests(), accN = myReqs.filter(function (r) { return r.status === 'Accepted'; }).length, docN = p.docs.filter(function (d) { return d.status !== 'Missing'; }).length;
     var feed = [];
     myRequests().forEach(function (r) {
       (r.events || []).forEach(function (e) { feed.push({ t: e.t, m: orgName(r.orgId) + ': ' + e.l + (e.note ? ' (' + e.note + ')' : '') }); });
@@ -1172,10 +1199,17 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     });
     feed.sort(function (a, b) { return a.t < b.t ? 1 : -1; });
     return modeNote() +
-      '<div class="hero"><p class="small" style="opacity:.8">Hello, ' + esc(first()) + '</p><div class="big">' + open + '</div><p>rooms open across ' + count + ' shelters right now</p><div class="row"><button class="btn" data-act="goto:find">Find a room</button>' + (p.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill warn">Not verified yet</span>') + '</div></div>' +
+      '<div class="hero"><p class="small" style="opacity:.8">Hello, ' + esc(first()) + '</p><div class="big">' + open + '</div><p>rooms open across ' + count + ' shelters right now</p><div class="row">' + (p.verified ? '<span class="pill ok">Verified</span>' : '<span class="pill warn">Not verified yet</span>') + '</div></div>' +
+      '<div class="tiles">' +
+      '<button class="tile main" data-act="goto:find"><svg viewBox="0 0 24 24">' + ICON.find + '</svg><b>Find a room tonight</b><span class="sub">' + open + ' rooms open now</span></button>' +
+      '<button class="tile t2" data-act="goto:req"><svg viewBox="0 0 24 24">' + ICON.req + '</svg><b>My requests</b><span class="sub">' + (myReqs.length ? myReqs.length + ' sent · ' + accN + ' accepted' : 'None sent yet') + '</span>' + (unread() ? '<span class="badge">' + unread() + '</span>' : '') + '</button>' +
+      '<button class="tile t3" data-act="goto:vault"><svg viewBox="0 0 24 24">' + ICON.vault + '</svg><b>Document vault</b><span class="sub">' + docN + ' of ' + p.docs.length + ' papers added</span></button>' +
+      '<button class="tile t4" data-act="goto:findh"><svg viewBox="0 0 24 24">' + ICON.bldg + '</svg><b>Housing providers</b><span class="sub">Apply for housing</span></button>' +
+      '<button class="tile t5" data-act="goto:help"><svg viewBox="0 0 24 24">' + ICON.help + '</svg><b>Help and what to bring</b><span class="sub">Answers, step by step</span></button></div>' +
+      '<div class="crisis" role="region" aria-label="Emergency help"><h3>Emergency help</h3><div class="row"><a class="sos" href="tel:911">911<span>Emergency</span></a><a class="sos" href="tel:988">988<span>Crisis line</span></a><a class="sos" href="tel:211">211<span>Services</span></a></div><button class="link small" data-act="goto:help" style="align-self:flex-start">More crisis lines</button></div>' +
       '<div class="card"><div class="row between"><h2>Next steps</h2><span class="small muted">' + doneN + ' of ' + steps.length + ' done</span></div><div class="meter"><b style="width:' + (doneN / steps.length * 100) + '%"></b></div><div>' +
       steps.map(function (s) { return '<div class="check"><div class="tick ' + (s[0] ? 'done' : '') + '">' + TICK + '</div><div class="grow"><b>' + s[1] + '</b><div class="small muted">' + s[2] + '</div></div>' + (s[0] ? '' : '<button class="btn ghost sm" data-act="' + s[3] + '">' + s[4] + '</button>') + '</div>'; }).join('') + '</div></div>' +
-      crisis() + '<div class="card"><h2>Updates</h2>' + (feed.length ? '<div class="stack">' + feed.slice(0, 6).map(function (f) { return '<div><div>' + esc(f.m) + '</div><div class="small muted">' + fmt(f.t) + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nothing yet. When an organization responds, you will see it here.</p>') + '</div>';
+      '<div class="card"><h2>Updates</h2>' + (feed.length ? '<div class="stack">' + feed.slice(0, 6).map(function (f) { return '<div><div>' + esc(f.m) + '</div><div class="small muted">' + fmt(f.t) + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nothing yet. When an organization responds, you will see it here.</p>') + '</div>';
   }
   function verifyView() {
     var p = mine(), body, via = p.phone ? showPhone(p.phone) : p.email;
