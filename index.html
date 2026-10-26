@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HomeConnect Canada</title>
-<meta name="theme-color" content="#0B6E6B">
+<meta name="theme-color" content="#43309B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="HomeConnect">
 <link rel="manifest" href="manifest.webmanifest">
@@ -15,21 +15,21 @@
 /* Layout: one centered column. Person app has a bottom tab bar; organization and admin consoles have top tabs.
    Palette: harbour ink, sea-glass teal accent, cool paper neutrals; status colours are separate. */
 :root {
-  --bg:#F1F5F6; --surface:#FFFFFF; --ink:#12222E; --muted:#566772; --line:#D6DFE3;
-  --accent:#0B6E6B; --accent-ink:#FFFFFF; --accent-soft:#DCEFED;
-  --ok:#1E7A46; --warn:#9A5A05; --crit:#B3261E; --band:#12222E; --band-ink:#E8F0F3; --band-accent:#6FD9D3;
+  --bg:#F5F3F9; --surface:#FFFFFF; --ink:#1B1840; --muted:#5B5778; --line:#DAD6E8;
+  --accent:#43309B; --accent-ink:#FFFFFF; --accent-soft:#E8E4F7;
+  --ok:#1E7A46; --warn:#9A5A05; --crit:#B3261E; --band:#1B1840; --band-ink:#EDEAF8; --band-accent:#F5A9B8;
   --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --body:"Public Sans","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg:#0D1920; --surface:#16252F; --ink:#E8F0F3; --muted:#9AABB6; --line:#2A3C48;
-  --accent:#4FC3BD; --accent-ink:#08201F; --accent-soft:#153B3A;
-  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0A1319; --band-ink:#E8F0F3; --band-accent:#4FC3BD; color-scheme:dark; } }
+  --bg:#110F24; --surface:#1B1938; --ink:#EDEAF8; --muted:#A9A5C6; --line:#2F2B55;
+  --accent:#B7A8FF; --accent-ink:#14102E; --accent-soft:#2A2559;
+  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0C0B1C; --band-ink:#EDEAF8; --band-accent:#B7A8FF; color-scheme:dark; } }
 :root[data-theme="dark"] {
-  --bg:#0D1920; --surface:#16252F; --ink:#E8F0F3; --muted:#9AABB6; --line:#2A3C48;
-  --accent:#4FC3BD; --accent-ink:#08201F; --accent-soft:#153B3A;
-  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0A1319; --band-ink:#E8F0F3; --band-accent:#4FC3BD; color-scheme:dark; }
+  --bg:#110F24; --surface:#1B1938; --ink:#EDEAF8; --muted:#A9A5C6; --line:#2F2B55;
+  --accent:#B7A8FF; --accent-ink:#14102E; --accent-soft:#2A2559;
+  --ok:#5FCB8A; --warn:#E8A951; --crit:#F08A82; --band:#0C0B1C; --band-ink:#EDEAF8; --band-accent:#B7A8FF; color-scheme:dark; }
 
 * { box-sizing:border-box; }
 html { padding-top:env(safe-area-inset-top,0px); }
@@ -48,8 +48,9 @@ button { cursor:pointer; }
 
 .top { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding-block:10px 0; max-width:720px; margin:0 auto; }
 .brand { display:flex; align-items:center; gap:10px; }
-.logo { width:32px; height:32px; border-radius:9px; background:var(--accent); display:grid; place-items:center; }
-.logo svg { width:20px; height:20px; stroke:var(--accent-ink); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.logo { width:34px; height:34px; border-radius:9px; overflow:hidden; display:block; }
+.logo svg { width:100%; height:100%; display:block; }
+.pride { flex-basis:100%; height:5px; border-radius:3px; background:linear-gradient(90deg,#E40303 0 16.6%,#FF8C00 0 33.3%,#FFED00 0 50%,#008026 0 66.6%,#004DFF 0 83.3%,#750787 0); }
 .brand b { font-family:var(--display); font-size:17px; }
 .modebar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 
@@ -1026,8 +1027,8 @@ details > summary { cursor:pointer; font-weight:600; } details + details { borde
     else if (r === 'org' && myOrg()) who = myOrg().name;
     else if (a) who = a.name;
     var pill = shared ? '<span class="pill ok">Shared test</span>' : '<span class="pill idle">This device only</span>';
-    $('#top').innerHTML = '<div class="brand"><div class="logo"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div><b>HomeConnect Canada</b></div>' +
-      '<div class="modebar">' + (STANDALONE ? '' : pill) + '<button class="btn ghost sm" data-act="togglelang" lang="' + (isFr() ? 'en' : 'fr') + '" aria-label="' + (isFr() ? 'Switch to English' : 'Passer au français') + '">' + (isFr() ? 'EN' : 'FR') + '</button><button class="btn ghost sm" data-act="lg" aria-pressed="' + !!ui.lg + '" aria-label="Larger text">Aa</button>' + (r ? '<span class="small muted">' + esc(who) + '</span><button class="btn ghost sm" data-act="signout">Sign out</button>' : (R.screen !== 'welcome' ? '<button class="btn ghost sm" data-act="home">← Start over</button>' : '')) + '</div>';
+    $('#top').innerHTML = '<div class="brand"><div class="logo"><svg viewBox="0 0 512 512" role="img" aria-label="HomeConnect"><rect width="512" height="512" rx="110" fill="#43309B"/><path d="M256 96L452 268H408V420H104V268H60Z" fill="#fff"/><path d="M190 400V316 A66 66 0 0 1 322 316 V400Z" fill="#E40303"/><path d="M201 400V316 A55 55 0 0 1 311 316 V400Z" fill="#FF8C00"/><path d="M212 400V316 A44 44 0 0 1 300 316 V400Z" fill="#FFED00"/><path d="M223 400V316 A33 33 0 0 1 289 316 V400Z" fill="#008026"/><path d="M234 400V316 A22 22 0 0 1 278 316 V400Z" fill="#004DFF"/><path d="M245 400V316 A11 11 0 0 1 267 316 V400Z" fill="#750787"/></svg></div><b>HomeConnect Canada</b></div>' +
+      '<div class="modebar">' + (STANDALONE ? '' : pill) + '<button class="btn ghost sm" data-act="togglelang" lang="' + (isFr() ? 'en' : 'fr') + '" aria-label="' + (isFr() ? 'Switch to English' : 'Passer au français') + '">' + (isFr() ? 'EN' : 'FR') + '</button><button class="btn ghost sm" data-act="lg" aria-pressed="' + !!ui.lg + '" aria-label="Larger text">Aa</button>' + (r ? '<span class="small muted">' + esc(who) + '</span><button class="btn ghost sm" data-act="signout">Sign out</button>' : (R.screen !== 'welcome' ? '<button class="btn ghost sm" data-act="home">← Start over</button>' : '')) + '</div><div class="pride" aria-hidden="true"></div>';
   }
   function tabbar() {
     var on = role() === 'person' && mine() && !R.showCode;
